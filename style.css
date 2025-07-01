@@ -1,0 +1,978 @@
+
+
+/* Pastikan box-sizing agar padding/border tidak menambah lebar */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Definisi Variabel Warna dan Lainnya */
+:root {
+    --primary-orange: #FF8C00;
+    --secondary-navy: #192A56;
+    --logout-blue: #0A0A23;
+    --white: #FFFFFF;
+    --light-grey: #F5F5F5;
+    --dark-grey: #333333;
+    --text-color: #444444;
+    --shadow-light: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --border-radius-small: 8px;
+    --border-radius-medium: 12px;
+    --border-radius-large: 20px;
+}
+
+/* Header */
+header {
+    background-color: var(--white); /* Mengatur header menjadi putih */
+    padding: 20px 0;
+    border-bottom: none;
+    box-shadow: none;
+    position: relative;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+/* Import Google Font Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+/* Definisi Variabel Warna dan Lainnya */
+:root {
+    --primary-orange: #FF8C00; /* Oranye terang */
+    --secondary-navy: #192A56; /* Biru tua / Navy yang lebih terang dari #0A0A23 */
+    --logout-blue: #0A0A23;    /* Biru tua spesifik untuk tombol logout */
+    --white: #FFFFFF;
+    --light-grey: #F5F5F5;
+    --dark-grey: #333333;
+    --text-color: #444444; /* Untuk teks konten umum */
+    --shadow-light: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --border-radius-small: 8px;
+    --border-radius-medium: 12px;
+    --border-radius-large: 20px;
+    /* --header-bg: #FC8A06; -- Ini tidak lagi diperlukan karena header akan putih */
+}
+
+/* General Reset & Body */
+body, h1, h2, h3, p, ul, li, a {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-decoration: none;
+    color: inherit;
+    box-sizing: border-box;
+    width: 100%; /* Pastikan lebar 100% */
+}
+
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    line-height: 1.6;
+    background-color: var(--light-grey); /* Menggunakan variabel putih yang sudah didefinisikan */
+    color: #333;
+    /* margin-top: 0; Ini sudah ditangani oleh html, body reset di atas */
+}
+
+/* Container untuk lebar konten */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Gelombang di atas header */
+/* Ini adalah bagian gelombang utama yang sebelumnya ada di dalam header atau di bawahnya */
+/* Sekarang ia adalah elemen terpisah di atas header */
+.top-wave-container {
+    width: 100%; /* Pastikan ini 100% untuk mengisi lebar penuh */
+    line-height: 0;
+    overflow: hidden; /* Untuk memastikan tidak ada scrollbar horizontal */
+    /* Jika masih tidak penuh, coba ini (namun perhatikan lapisan elemen): */
+    /* position: absolute; */
+    /* top: 0; */
+    /* left: 0; */
+    /* z-index: 1; */
+}
+
+.top-wave-container svg {
+    display: block; /* Penting untuk menghilangkan spasi di bawah SVG */
+    width: 100%; /* SVG harus mengisi lebar containernya */
+    height: 50px; /* Tinggi gelombang yang Anda inginkan */
+}
+/* Header Utama */
+.main-header {
+    background-color: var(--white); /* Latar belakang header putih */
+    padding: 20px 0;
+    position: relative; /* Untuk konteks penempatan elemen internal */
+    z-index: 1000;
+    box-shadow: var(--shadow-light); /* Tambahkan shadow agar lebih menonjol */
+}
+
+.main-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.main-header .logo {
+    display: flex;
+    align-items: center;
+    /* gap: 10px; -- Dihapus karena teks bakery tidak lagi di sini */
+}
+
+.main-header .logo img {
+    height: 50px; /* Sesuaikan ukuran logo gambar */
+    width: auto;
+    /* filter: brightness(0) invert(0); -- Hapus filter jika logo sudah berwarna sesuai keinginan */
+    /* border-radius: 50%; -- Hapus jika logo tidak perlu bulat */
+}
+
+/* Bagian .main-header .logo h1, .logo span, .logo .bakery-text dihapus/diabaikan
+   karena logo sekarang hanya gambar berdasarkan instruksi sebelumnya.
+   Jika logo-home.png Anda sudah termasuk teks "SweetLoaf BAKERY",
+   maka tidak perlu ada elemen teks terpisah di HTML/CSS untuk itu. */
+
+/* Navigasi Utama */
+.main-nav ul {
+    display: flex;
+    align-items: center;
+    gap: 30px; /* Jarak antar item menu */
+}
+
+.main-nav .nav-link {
+    color: var(--dark-grey); /* Warna teks menu default gelap (karena header putih) */
+    font-weight: 600;
+    font-size: 1em;
+    padding: 8px 0;
+    position: relative;
+    transition: color 0.3s ease;
+    border-radius: var(--border-radius-small); /* Tambahkan border-radius untuk semua elemen */
+}
+
+.main-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 3px; /* Ketebalan garis bawah */
+    background-color: var(--primary-orange); /* Warna garis bawah oranye */
+    left: 0;
+    bottom: -5px; /* Posisi garis di bawah teks */
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.main-nav .nav-link:hover {
+    color: var(--primary-orange); /* Warna teks saat hover menjadi oranye */
+    /* background-color: rgba(255, 140, 0, 0.1); */ /* Background muncul halus saat hover */
+    background-color: var(--light-grey); /* Warna background saat hover yang lebih sesuai dengan header putih */
+    padding: 8px 12px; /* Padding untuk efek background */
+    margin: 0 -12px; /* Offset margin agar tidak mengganggu layout */
+}
+
+.main-nav .nav-link:hover::after {
+    width: 100%;
+}
+
+/* Styling untuk menu aktif */
+.main-nav .nav-link.active {
+    color: var(--primary-orange); /* Warna teks oranye terang untuk yang aktif */
+    font-weight: 700; /* Sedikit lebih tebal untuk yang aktif */
+}
+
+.main-nav .nav-link.active::after {
+    content: '';
+    position: absolute;
+    width: 100%; /* Garis penuh untuk yang aktif */
+    height: 3px;
+    background-color: var(--primary-orange); /* Garis oranye untuk yang aktif */
+    left: 0;
+    bottom: -5px;
+    border-radius: 2px;
+}
+
+/* Tombol Logout */
+.main-nav .btn-logout {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Jarak antara ikon dan teks */
+    background-color: var(--logout-blue); /* Latar belakang biru tua */
+    color: var(--white); /* Teks putih */
+    padding: 10px 20px;
+    border-radius: 50px; /* Bentuk oval */
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: var(--shadow-light);
+}
+
+.main-nav .btn-logout i {
+    color: var(--primary-orange); /* Warna ikon oranye */
+    font-size: 1.1em;
+}
+
+.main-nav .btn-logout:hover {
+    background-color: #1A2E40; /* Sedikit lebih terang/beda biru tua saat hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+/* Gaya untuk ikon menu (jika digunakan untuk mobile) */
+.menu-icon {
+    display: none; /* Defaultnya sembunyikan, akan ditampilkan di mobile */
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--dark-grey); /* Warna ikon menu sesuai header putih */
+}
+
+/* Hero Section (home.php) */
+.hero-section {
+    background-image: url('assets/hero-bg.png'); /* Menggunakan gambar latar belakang dari halaman login */
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 80px 20px;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 500px;
+}
+
+.hero-section .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.hero-content {
+    text-align: left;
+    max-width: 50%;
+    padding-right: 20px;
+}
+
+.hero-content p {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    color: #F8F8F8;
+}
+
+.hero-content h1 {
+    font-size: 3.5em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.heading-pesan-sekarang {
+    color: var(--primary-orange); /* Menggunakan variabel warna */
+    font-size: 3em;
+    margin-top: 0;
+    margin-bottom: 40px;
+    position: relative;
+    display: inline-block;
+}
+
+.heading-pesan-sekarang::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    width: 100%;
+    height: 4px;
+    background-color: var(--primary-orange); /* Menggunakan variabel warna */
+    border-radius: 2px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--border-radius-small);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
+}
+
+.btn-primary {
+    display: inline-block;
+    background-color: var(--primary-orange); /* Menggunakan variabel warna */
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.btn-primary:hover {
+    background-color: #E07B00; /* Sedikit lebih gelap dari primary-orange */
+    transform: translateY(-2px);
+}
+
+.hero-images {
+    flex: 1;
+    text-align: right;
+}
+
+.hero-images img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-medium); /* Menggunakan variabel border-radius */
+    box-shadow: var(--shadow-medium); /* Menggunakan variabel shadow */
+}
+
+/* Product Sections (home.php - Best Sellers & All Products) */
+.product-section {
+    padding: 60px 0;
+    background-color: var(--light-grey); /* Menggunakan variabel warna */
+}
+
+.product-section.best-sellers {
+    background-color: #f0f0f0; /* Bisa disesuaikan lebih lanjut jika ada variabel untuk ini */
+}
+
+.product-section h2 {
+    text-align: center;
+    font-size: 2.5em;
+    color: var(--secondary-navy); /* Menggunakan variabel warna */
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.product-section h2::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -10px;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background-color: var(--primary-orange); /* Menggunakan variabel warna */
+    border-radius: 2px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    justify-content: center;
+}
+
+.product-card {
+    background-color: var(--white); /* Menggunakan variabel warna */
+    border-radius: var(--border-radius-medium); /* Menggunakan variabel border-radius */
+    box-shadow: var(--shadow-light); /* Menggunakan variabel shadow */
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding-bottom: 20px;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium); /* Menggunakan variabel shadow */
+}
+
+.product-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid var(--light-grey); /* Menggunakan variabel warna */
+    margin-bottom: 15px;
+}
+
+.product-card h3 {
+    font-size: 1.5em;
+    color: var(--secondary-navy); /* Menggunakan variabel warna */
+    margin: 10px 15px;
+}
+
+.product-card .price {
+    font-size: 1.3em;
+    color: var(--primary-orange); /* Menggunakan variabel warna */
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.product-card .description {
+    font-size: 0.9em;
+    color: #666;
+    margin: 0 15px 20px;
+    line-height: 1.5;
+    height: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.product-card .btn-add-to-cart {
+    background-color: #28a745; /* Tetap hijau, bisa juga jadi variabel jika sering digunakan */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--border-radius-small);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 0.95em;
+    width: calc(100% - 30px);
+    margin: 0 15px;
+}
+
+.product-card .btn-add-to-cart:hover {
+    background-color: #218838;
+}
+
+.view-all-button {
+    text-align: center;
+    margin-top: 40px;
+}
+
+/* Testimonials Section (home.php) */
+.testimonials-section {
+    padding: 60px 0;
+    background-color: var(--white); /* Menggunakan variabel warna */
+    text-align: center;
+}
+
+.testimonials-section h2 {
+    font-size: 2.5em;
+    color: var(--secondary-navy); /* Menggunakan variabel warna */
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.testimonials-section h2::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -10px;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background-color: var(--primary-orange); /* Menggunakan variabel warna */
+    border-radius: 2px;
+}
+
+.overall-rating-summary {
+    margin-bottom: 40px;
+    background-color: #f0f0f0;
+    padding: 30px;
+    border-radius: var(--border-radius-medium); /* Menggunakan variabel border-radius */
+    display: inline-block;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.overall-rating-summary h3 {
+    font-size: 1.8em;
+    color: var(--secondary-navy); /* Menggunakan variabel warna */
+    margin-bottom: 15px;
+}
+
+.overall-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.overall-rating span {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: var(--primary-orange); /* Menggunakan variabel warna */
+}
+
+.overall-rating .stars .fas {
+    color: var(--primary-orange); /* Menggunakan variabel warna */
+    font-size: 1.8em;
+}
+
+/* Testimonial Carousel Styling */
+.carousel-container {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    overflow: hidden;
+    padding: 0 50px;
+}
+
+.testimonial-wrapper {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.testimonial-card {
+    min-width: calc(33.33% - 20px);
+    box-sizing: border-box;
+    margin: 0 10px;
+    background-color: var(--light-grey); /* Menggunakan variabel warna */
+    border-radius: var(--border-radius-medium); /* Menggunakan variabel border-radius */
+    padding: 30px;
+    box-shadow: var(--shadow-light); /* Menggunakan variabel shadow */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 220px;
+    flex-shrink: 0;
+}
+
+.testimonial-card .customer-avatar {
+    font-size: 3em;
+    color: var(--primary-orange); /* Menggunakan variabel warna */
+    margin-bottom: 15px;
+}
+
+.testimonial-card .quote {
+    font-style: italic;
+    color: #555;
+    margin-bottom: 15px;
+    flex-grow: 1;
+}
+
+.testimonial-card .rating .fas, .testimonial-card .rating .far {
+    color: var(--primary-orange); /* Menggunakan variabel warna */
+    font-size: 1.2em;
+    margin: 0 2px;
+}
+
+.testimonial-card .customer-name {
+    font-weight: bold;
+    color: var(--secondary-navy); /* Menggunakan variabel warna */
+    margin-top: 15px;
+}
+
+.no-testimonials-message {
+    font-style: italic;
+    color: #777;
+    padding: 30px;
+}
+
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5em;
+    z-index: 10;
+    transition: background-color 0.3s;
+}
+
+.carousel-button:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.carousel-button.prev {
+    left: 10px;
+}
+
+.carousel-button.next {
+    right: 10px;
+}
+
+/* Footer */
+footer {
+    background-color: var(--light-grey); /* Menggunakan variabel warna */
+    color: #555;
+    padding: 50px 0 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+footer .container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.footer-left {
+    flex: 1;
+    min-width: 280px;
+}
+
+.footer-left .logo {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.footer-left .logo img {
+    height: 40px;
+    margin-right: 10px;
+    /* filter: brightness(0) invert(0); -- Sesuaikan filter ini jika logo footer Anda perlu disesuaikan warnanya */
+}
+.footer-left .logo span {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--dark-grey); /* Warna lebih gelap untuk teks logo footer */
+}
+
+.footer-left .logo .bakery-text {
+    font-size: 18px;
+    color: var(--dark-grey);
+    margin-left: 5px;
+    font-weight: normal;
+}
+
+.footer-left .social-media a {
+    color: var(--secondary-navy); /* Menggunakan variabel warna */
+    font-size: 24px;
+    margin-right: 15px;
+    transition: color 0.3s;
+}
+
+.footer-left .social-media a:hover {
+    color: var(--primary-orange); /* Menggunakan variabel warna */
+}
+
+.footer-right h4 {
+    font-size: 1.5em;
+    color: var(--secondary-navy); /* Menggunakan variabel warna */
+    margin-bottom: 20px;
+}
+
+.footer-right .map-placeholder {
+    width: 300px;
+    height: 150px;
+    background-color: #eee;
+    border-radius: var(--border-radius-medium); /* Menggunakan variabel border-radius */
+    overflow: hidden;
+}
+
+.footer-right .map-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.copyright {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    font-size: 0.9em;
+    color: #777;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .main-header .container {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .main-nav ul {
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .main-nav .nav-link,
+    .main-nav .btn-logout {
+        width: 100%;
+        padding: 12px 0;
+        border-radius: var(--border-radius-small);
+        background-color: var(--light-grey); /* Latar belakang saat menu ditumpuk */
+        color: var(--dark-grey); /* Teks gelap di mobile */
+    }
+
+    .main-nav .nav-link.active {
+        background-color: var(--logout-blue); /* Latar belakang berbeda untuk aktif di mobile */
+        color: var(--primary-orange); /* Teks oranye di mobile */
+    }
+    .main-nav .nav-link.active::after {
+        display: none;
+    }
+
+    .main-nav .nav-link:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+        color: var(--dark-grey); /* Tetap gelap saat hover di mobile */
+    }
+    .main-nav .nav-link:hover::after {
+        width: 0;
+    }
+
+    .main-nav .btn-logout {
+        margin-top: 10px;
+    }
+
+    /* Mengabaikan main-header .logo h1 karena tidak ada lagi elemen tersebut */
+
+    .menu-icon {
+        display: block;
+    }
+
+    .hero-section .container {
+        flex-direction: column;
+    }
+
+    .hero-content {
+        max-width: 100%;
+        padding-right: 0;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .hero-content h1 {
+        font-size: 2.8em;
+    }
+
+    .heading-pesan-sekarang {
+        font-size: 2.5em;
+    }
+
+    .hero-images {
+        text-align: center;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+
+    .testimonials-section {
+        padding: 40px 0;
+    }
+
+    .testimonial-card {
+        min-width: calc(50% - 20px);
+    }
+
+    .carousel-container {
+        padding: 0 10px;
+    }
+
+    footer .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .footer-right {
+        text-align: center;
+        margin-top: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-header .logo img {
+        height: 40px;
+    }
+    /* Mengabaikan main-header .logo h1, .logo span, .logo .bakery-text karena tidak ada lagi elemen tersebut */
+
+    .hero-content h1 {
+        font-size: 2em;
+    }
+    .heading-pesan-sekarang {
+        font-size: 1.8em;
+    }
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+    .testimonial-card {
+        min-width: calc(100% - 20px);
+    }
+    .carousel-button {
+        font-size: 1.2em;
+        padding: 8px 12px;
+    }
+}
+
+/* Styling untuk pesanan.php */
+
+.pesanan-section {
+    padding: 60px 0;
+    background-color: var(--light-grey);
+    min-height: 80vh; /* Agar konten tidak terlalu pendek */
+}
+
+.pesanan-section .section-title {
+    text-align: center;
+    color: var(--dark-grey);
+    margin-bottom: 40px;
+    font-size: 2.5em;
+    font-weight: 700;
+}
+
+.empty-cart-message {
+    text-align: center;
+    font-size: 1.2em;
+    color: var(--text-color);
+    margin-bottom: 30px;
+}
+
+.center-button {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.order-summary-box {
+    background-color: var(--white);
+    padding: 30px;
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-medium);
+    display: flex;
+    flex-direction: column;
+    gap: 30px; /* Jarak antar bagian dalam kotak summary */
+}
+
+.order-items-list {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+}
+
+.order-item-card {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.order-item-card:last-child {
+    border-bottom: none;
+}
+
+.item-image {
+    flex-shrink: 0; /* Jangan biarkan gambar menyusut */
+    width: 80px;
+    height: 80px;
+    margin-right: 15px;
+    border-radius: var(--border-radius-small);
+    overflow: hidden;
+    background-color: #f0f0f0;
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.item-details {
+    flex-grow: 1; /* Biarkan detail mengisi ruang yang tersedia */
+}
+
+.item-details h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.1em;
+    color: var(--dark-grey);
+}
+
+.item-details p {
+    margin: 0;
+    font-size: 0.9em;
+    color: var(--text-color);
+}
+
+.item-subtotal {
+    font-weight: 600;
+    color: var(--primary-orange) !important; /* Penting untuk menyorot subtotal */
+    margin-top: 5px !important;
+}
+
+.order-total-summary {
+    padding-top: 20px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.3em;
+    font-weight: 700;
+    color: var(--dark-grey);
+    margin-bottom: 10px;
+}
+
+.delivery-details-form {
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.delivery-details-form h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--dark-grey);
+    font-size: 1.5em;
+}
+
+.delivery-details-form .form-group {
+    margin-bottom: 15px;
+}
+
+.delivery-details-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.delivery-details-form input[type="text"],
+.delivery-details-form input[type="tel"],
+.delivery-details-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius-small);
+    font-size: 1em;
+    box-sizing: border-box; /* Pastikan padding tidak menambah lebar */
+}
+
+.delivery-details-form textarea {
+    resize: vertical; /* Hanya izinkan perubahan ukuran vertikal */
+    min-height: 80px;
+}
+
+.btn-proceed-payment {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-top: 20px;
+    /* btn-primary styles should apply */
+}
+
+/* Media Queries untuk Responsif */
+@media (max-width: 768px) {
+    .pesanan-section {
+        padding: 40px 0;
+    }
+
+    .pesanan-section .section-title {
+        font-size: 2em;
+    }
+
+    .order-summary-box {
+        padding: 20px;
+    }
+
+    .item-image {
+        width: 60px;
+        height: 60px;
+        margin-right: 10px;
+    }
+
+    .item-details h3 {
+        font-size: 1em;
+    }
+
+    .item-details p {
+        font-size: 0.85em;
+    }
+
+    .total-row {
+        font-size: 1.1em;
+    }
+
+    .delivery-details-form h3 {
+        font-size: 1.3em;
+    }
+}
