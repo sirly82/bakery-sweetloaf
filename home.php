@@ -71,7 +71,9 @@ $conn->close();
         <nav class="main-nav">
             <ul>
                 <li><a href="home.php" class="nav-link active">Beranda</a></li>
-                <li><a href="pesanan.php" class="nav-link">Pesanan</a></li>
+                <li><a href="pesanan.php" class="nav-link">Keranjang</a></li>
+                <li><a href="#" class="nav-link">Pesanan</a></li>
+                <li><a href="#" class="nav-link">Tentang Kami</a></li>
                 <li><a href="#" class="nav-link">Kelola Akun</a></li>
                 <?php if (isset($_SESSION['username'])): // Tampilkan tombol keluar hanya jika sudah login ?>
                     <li>

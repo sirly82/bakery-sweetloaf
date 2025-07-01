@@ -64,6 +64,7 @@ $grand_total = 0;
 
 $sql_cart = "
     SELECT 
+        k.produk_id,
         k.jumlah, 
         p.nama AS nama_produk, 
         p.harga AS harga_satuan,
@@ -82,6 +83,7 @@ if ($result_cart->num_rows > 0) {
         $subtotal = $row['jumlah'] * $row['harga_satuan'];
         $grand_total += $subtotal;
         $cart_items[] = [
+            'produk_id' => $row['produk_id'],
             'nama_produk' => $row['nama_produk'],
             'foto_produk' => $row['foto_produk'],
             'harga_satuan' => $row['harga_satuan'],
@@ -127,11 +129,12 @@ $conn->close();
             </div>
             <nav class="main-nav">
                 <ul class="nav-links">
-                    <li><a href="home.php">Home</a></li>
-                    <li><a href="#">Produk</a></li>
-                    <li><a href="#">Tentang Kami</a></li>
-                    <li><a href="#">Kontak</a></li>
-                </ul>
+                    <li><a href="home.php" class="nav-link">Beranda</a></li>
+                    <li><a href="pesanan.php" class="nav-link active">Keranjang</a></li>
+                    <li><a href="#" class="nav-link">Pesanan</a></li>
+                    <li><a href="#" class="nav-link">Tentang Kami</a></li>
+                    <li><a href="#" class="nav-link">Kelola Akun</a></li>
+                </u>
             </nav>
             <div class="header-actions">
                 <a href="#" class="cart-icon"><i class="fas fa-shopping-cart"></i></a>
@@ -166,109 +169,86 @@ $conn->close();
                                     </div>
                                     <div class="item-details">
                                         <h3><?php echo htmlspecialchars($item['nama_produk']); ?></h3>
-                                        <p>Harga Satuan: Rp <?php echo number_format($item['harga_satuan'], 0, ',', '.'); ?></p>
-                                        <p>Jumlah: <?php echo htmlspecialchars($item['jumlah']); ?></p>
-                                        <p class="item-subtotal">Subtotal: Rp <?php echo number_format($item['subtotal'], 0, ',', '.'); ?></p>
+                                        <p>Harga Satuan : Rp<?php echo number_format($item['harga_satuan'], 0, ',', '.'); ?></p>
+
+                                        <!-- Form Tambah/Kurang -->
+                                        <form action="update_keranjang.php" method="POST" class="quantity-form" style="display: flex; align-items: center; gap: 5px; margin: 5px 0;">
+                                            <input type="hidden" name="produk_id" value="<?php echo $item['produk_id']; ?>">
+                                            <button type="submit" name="action" value="kurang">-</button>
+                                            <span><?php echo htmlspecialchars($item['jumlah']); ?></span>
+                                            <button type="submit" name="action" value="tambah">+</button>
+                                        </form>
+
+                                        <!-- Form Hapus -->
+                                        <form action="update_keranjang.php" method="POST" style="margin-top: 5px;">
+                                            <input type="hidden" name="produk_id" value="<?php echo $item['produk_id']; ?>">
+                                            <button type="submit" name="action" value="hapus" style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px;">Hapus</button>
+                                        </form>
+
+                                        <p class="item-subtotal">Subtotal : Rp<?php echo number_format($item['subtotal'], 0, ',', '.'); ?></p>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
-
+                        
+                        <!-- Total dan tombol tambah produk -->
                         <div class="order-summary-container">
                             <div class="order-total-summary">
                                 <div class="total-row">
-                                    <span>Total Belanja:</span>
-                                    <span class="total-amount">Rp <?php echo number_format($grand_total, 0, ',', '.'); ?></span>
+                                    <span>Total Belanja :</span>
+                                    <span class="total-amount">Rp<?php echo number_format($grand_total, 0, ',', '.'); ?></span>
                                 </div>
                             </div>
-
-                            <!-- <div class="delivery-details-form">
-                                <h3 class="form-title">Detail Pengiriman</h3>
-                                <form action="pembayaran.php" method="POST" class="shipping-form">
-                                    <div class="form-group">
-                                        <label for="nama_penerima" class="form-label">Nama Penerima:</label>
-                                        <input type="text" id="nama_penerima" name="nama_penerima" 
-                                            value="<?php echo htmlspecialchars($nama_user ?? ''); ?>" 
-                                            class="form-input"
-                                            placeholder="Masukkan nama penerima"
-                                            required>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="nomor_telepon" class="form-label">Nomor Telepon:</label>
-                                        <input type="tel" id="nomor_telepon" name="nomor_telepon" 
-                                            value="<?php echo htmlspecialchars($telepon_user ?? ''); ?>" 
-                                            class="form-input"
-                                            placeholder="Contoh: 081234567890"
-                                            pattern="[0-9]{10,13}"
-                                            title="Nomor telepon harus 10-13 digit angka"
-                                            required>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="alamat_pengiriman" class="form-label">Alamat Pengiriman:</label>
-                                        <textarea id="alamat_pengiriman" name="alamat_pengiriman" rows="3" 
-                                                class="form-textarea" required><?php echo htmlspecialchars($alamat_user); ?></textarea>
-                                        <small class="form-note">* Pastikan alamat sudah benar</small>
-                                    </div>
-                                    
-                                    <input type="hidden" name="total_harga" value="<?php echo $grand_total; ?>">
-                                    
-                                    <div class="form-actions">
-                                        <button type="button" class="btn-secondary" onclick="window.location.href='home.php'">Kembali</button>
-                                        <button type="submit" name="submit_order" class="btn-primary">Lanjutkan ke Pembayaran</button>
-                                    </div>
-                                </form>
-                            </div> -->
-
-
-
-                            <div class="delivery-details-form">
-                                <h3 class="form-title">Detail Pengiriman</h3>
-                                <form action="pembayaran.php" method="POST" class="shipping-form">
-                                    <div class="form-group">
-                                        <label for="nama_penerima" class="form-label">Nama Penerima:</label>
-                                        <input type="text" id="nama_penerima" name="nama_penerima" 
-                                            value="<?php echo htmlspecialchars($nama_user ?? ''); ?>" 
-                                            class="form-input"
-                                            placeholder="Masukkan nama penerima"
-                                            required>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="nomor_telepon" class="form-label">Nomor Telepon:</label>
-                                        <input type="tel" id="nomor_telepon" name="nomor_telepon" 
-                                            value="<?php echo htmlspecialchars($telepon_user ?? ''); ?>" 
-                                            class="form-input"
-                                            placeholder="Contoh: 081234567890"
-                                            pattern="[0-9]{10,13}"
-                                            title="Nomor telepon harus 10-13 digit angka"
-                                            required>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="alamat_pengiriman" class="form-label">Alamat Pengiriman:</label>
-                                        <textarea id="alamat_pengiriman" name="alamat_pengiriman" rows="3" 
-                                                class="form-textarea" required><?php echo htmlspecialchars($alamat_user); ?></textarea>
-                                        <small class="form-note">* Pastikan alamat sudah benar</small>
-                                    </div>
-
-                                    <input type="hidden" name="total_harga" value="<?php echo $grand_total; ?>">
-                                    <?php foreach ($cart_items as $index => $item): ?>
-                                        <input type="hidden" name="items[<?php echo $index; ?>][nama_produk]" value="<?php echo htmlspecialchars($item['nama_produk']); ?>">
-                                        <input type="hidden" name="items[<?php echo $index; ?>][harga_satuan]" value="<?php echo $item['harga_satuan']; ?>">
-                                        <input type="hidden" name="items[<?php echo $index; ?>][jumlah]" value="<?php echo $item['jumlah']; ?>">
-                                        <input type="hidden" name="items[<?php echo $index; ?>][subtotal]" value="<?php echo $item['subtotal']; ?>">
-                                    <?php endforeach; ?>
-                                    
-                                    <div class="form-actions">
-                                        <button type="button" class="btn-secondary" onclick="window.location.href='home.php'">Kembali</button>
-                                        <button type="submit" name="submit_order" class="btn-primary">Lanjutkan ke Pembayaran</button>
-                                    </div>
-                                </form>
+                            
+                            <div class="form-actions" style="margin-top: 20px;">
+                                <a href="home.php#products" class="btn-secondary" style="background-color: #ccc; padding: 10px 20px; text-decoration: none; border-radius: 5px;">+ Tambah Produk</a>
                             </div>
                         </div>
+                    </div>
 
+                    <div class="delivery-details-form">
+                        <h3 class="form-title">Detail Pengiriman</h3>
+                        <form action="pembayaran.php" method="POST" class="shipping-form">
+                            <div class="form-group">
+                                <label for="nama_penerima" class="form-label">Nama Penerima:</label>
+                                <input type="text" id="nama_penerima" name="nama_penerima" 
+                                    value="<?php echo htmlspecialchars($nama_user ?? ''); ?>" 
+                                    class="form-input"
+                                    placeholder="Masukkan nama penerima"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="nomor_telepon" class="form-label">Nomor Telepon:</label>
+                                <input type="tel" id="nomor_telepon" name="nomor_telepon" 
+                                    value="<?php echo htmlspecialchars($telepon_user ?? ''); ?>" 
+                                    class="form-input"
+                                    placeholder="Contoh: 081234567890"
+                                    pattern="[0-9]{10,13}"
+                                    title="Nomor telepon harus 10-13 digit angka"
+                                    required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="alamat_pengiriman" class="form-label">Alamat Pengiriman:</label>
+                                <textarea id="alamat_pengiriman" name="alamat_pengiriman" rows="3" 
+                                        class="form-textarea" required><?php echo htmlspecialchars($alamat_user); ?></textarea>
+                                <small class="form-note">* Pastikan alamat sudah benar</small>
+                            </div>
+
+                            <input type="hidden" name="total_harga" value="<?php echo $grand_total; ?>">
+                            <?php foreach ($cart_items as $index => $item): ?>
+                                <input type="hidden" name="items[<?php echo $index; ?>][nama_produk]" value="<?php echo htmlspecialchars($item['nama_produk']); ?>">
+                                <input type="hidden" name="items[<?php echo $index; ?>][harga_satuan]" value="<?php echo $item['harga_satuan']; ?>">
+                                <input type="hidden" name="items[<?php echo $index; ?>][jumlah]" value="<?php echo $item['jumlah']; ?>">
+                                <input type="hidden" name="items[<?php echo $index; ?>][subtotal]" value="<?php echo $item['subtotal']; ?>">
+                            <?php endforeach; ?>
+                            
+                            <div class="form-actions-row">
+                                <a href="home.php" class="btn-cancel">Kembali</a>
+                                <button type="submit" name="submit_order" class="btn-proceed-payment">Lanjutkan ke Pembayaran</button>
+                            </div>
+                        </form>
                     </div>
                 <?php endif; ?>
             </div>
@@ -299,4 +279,5 @@ $conn->close();
             <p>ESKALA Copyright 2025. All Rights Reserved.</p>
         </div>
     </footer>
+    <script src="assets/js/cart.js"></script> </body>
 </html>
