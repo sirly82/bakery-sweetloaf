@@ -1,0 +1,70 @@
+/* ===== Global Layout ===== */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #fefefe;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* ===== Success Container ===== */
+.success-container {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 40px 30px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  border: 1px solid #eaeaea;
+}
+
+/* ===== Icon ===== */
+.success-icon {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 25px;
+}
+
+.success-icon img {
+  width: 100%;
+  height: auto;
+}
+
+/* ===== Heading ===== */
+.success-container h1 {
+  font-size: 28px;
+  color: #28a745;
+  margin-bottom: 10px;
+}
+
+/* ===== Message ===== */
+.success-message {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+/* ===== Button ===== */
+#goHomeBtn {
+  background-color: #FC8A06;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(252, 138, 6, 0.3);
+}
+
+#goHomeBtn:hover {
+  background-color: #e57603;
+  box-shadow: 0 6px 16px rgba(252, 138, 6, 0.4);
+  transform: translateY(-2px);
+}
