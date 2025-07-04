@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 25, 2025 at 07:20 PM
+-- Generation Time: Jul 04, 2025 at 04:02 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,34 @@ SET time_zone = "+00:00";
 --
 -- Database: `bakery`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bakery_settings`
+--
+
+CREATE TABLE `bakery_settings` (
+  `id` int(11) NOT NULL,
+  `setting_key` varchar(255) NOT NULL,
+  `setting_value` text DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `bakery_settings`
+--
+
+INSERT INTO `bakery_settings` (`id`, `setting_key`, `setting_value`, `description`, `created_at`, `updated_at`) VALUES
+(1, 'bakery_name', 'SweetLoaf Bakery', 'Nama bakery', '2025-07-04 12:56:04', '2025-07-04 12:56:04'),
+(2, 'bakery_address', 'Jl. Contoh No. 123, Kota Anda, 12345', 'Alamat lengkap bakery', '2025-07-04 12:56:04', '2025-07-04 12:56:04'),
+(3, 'bakery_phone', '+62 812 3456 7890', 'Nomor telepon kontak bakery', '2025-07-04 12:56:04', '2025-07-04 12:56:04'),
+(4, 'bakery_email', 'info@sweetloaf.com', 'Email kontak bakery', '2025-07-04 12:56:04', '2025-07-04 12:56:04'),
+(5, 'operating_hours', 'Senin - Sabtu, 08:00 - 20:00', 'Jam operasional bakery', '2025-07-04 12:56:04', '2025-07-04 12:56:04'),
+(6, 'delivery_fee', '15000', 'Biaya pengiriman default', '2025-07-04 12:56:04', '2025-07-04 12:56:04'),
+(7, 'min_order_for_delivery', '50000', 'Minimal order untuk pengiriman', '2025-07-04 12:56:04', '2025-07-04 12:56:04');
 
 -- --------------------------------------------------------
 
@@ -140,103 +168,44 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `username`, `password`, `email`, `phone`, `address`, `role`, `created_at`) VALUES
-(1, 'Bellarissa Revicha', 'bellarrvc', '$2y$10$RVYpNNbNlEdJR0RIUcZlL.blO3m9WvJ20HP8m57gtp5lMDU7Zn4hi', 'bellarissa@gmail.com', '085927771534', 'Jogja', 'admin', '2024-12-29 16:38:54'),
-(5, 'Deandra', 'deandra', '$2y$10$sotqtfo4FPqPK2J3HuNqe.6a6BMPrE1mP4cFL7C7QaK8ebBSKo.vC', 'deandra@gmail.com', '085927771534', 'Jogja', 'user', '2025-01-10 16:25:59'),
-(24, 'anayra', 'anayra', '$2y$10$R8kMxsi9Rpct/ClntQwPruhyNuj.bJwoVLWqT//Smar2vn5sOcn0a', 'anayra@gmail.com', '083250739742', 'Yogya', 'admin', '2025-04-17 01:39:17'),
-(25, 'FIKRIAN', 'cappuccin', '$2y$10$6sNGhBV8Vv2yYqRFpeBpI.7pPa1Z/.d.5aumBEnsAncv6v55kFpEy', 'kafein@gmail.com', '', '', 'user', '2025-06-11 15:03:49'),
-(30, 'LOKIIII', 'LOKIIII', '$2y$10$6Gx8zWtkKHi/t7jaZDYKDO5IxijxR8YhpCAlifXe5u2zOkiRHXXMm', 'LOKIIII@gmail.com', '081392779785', 'adadeh', 'user', '2025-06-11 15:15:13'),
-(31, 'Fikri', 'FIKRI', '$2y$10$KamKoVprVOzZJdGgMaoXU.dSwtGHLXvg3Nw4IenQ/y.xD7sXwzbx6', 'FIKRI@gmail.com', '081392779785', 'ADA', 'admin', '2025-06-12 01:24:24'),
-(32, 'nasywa', 'nasywa', '$2y$10$RaO5AVm2N1t2pIIwf4xBkOL.lokYj4p/zJl2YhDHiLL47NkHnRCT2', 'nasywa@gmail.com', '081312123232', 'demak', 'user', '2025-06-13 11:40:30');
+(1, 'Admin Toko', 'admin_bakery', '$2y$10$zKhpFNOAuxSgaD62jEso..IOXz6imGTrUOeyjwxGJj5ahPefbopIS', 'admin@bakery.com', '081234567890', 'Jalan Raya Bakery No. 1, Jakarta', 'admin', '2025-07-04 12:10:16'),
+(2, 'Pengguna Biasa', 'user_roti', '$2y$10$zKhpFNOAuxSgaD62jEso..IOXz6imGTrUOeyjwxGJj5ahPefbopIS', 'user@bakery.com', '085678901234', 'Jalan Kue Manis No. 5, Bandung', 'user', '2025-07-04 12:10:16'),
+(3, 'ada', 'adalah', '$2y$10$zKhpFNOAuxSgaD62jEso..IOXz6imGTrUOeyjwxGJj5ahPefbopIS', 'apalah@gmail.com', '08111111111', '-', 'user', '2025-07-04 12:11:02');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `keranjang`
+-- Indexes for table `bakery_settings`
 --
-ALTER TABLE `keranjang`
+ALTER TABLE `bakery_settings`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `produk_id` (`produk_id`);
-
---
--- Indexes for table `pesanan`
---
-ALTER TABLE `pesanan`
-  ADD PRIMARY KEY (`id_pesanan`);
-
---
--- Indexes for table `products`
---
-ALTER TABLE `products`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `testimonials`
---
-ALTER TABLE `testimonials`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD UNIQUE KEY `setting_key` (`setting_key`);
 
 --
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`),
-  ADD UNIQUE KEY `username` (`username`);
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT for table `keranjang`
+-- AUTO_INCREMENT for table `bakery_settings`
 --
-ALTER TABLE `keranjang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=205;
-
---
--- AUTO_INCREMENT for table `pesanan`
---
-ALTER TABLE `pesanan`
-  MODIFY `id_pesanan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `products`
---
-ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
--- AUTO_INCREMENT for table `testimonials`
---
-ALTER TABLE `testimonials`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `bakery_settings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `keranjang`
---
-ALTER TABLE `keranjang`
-  ADD CONSTRAINT `keranjang_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `keranjang_ibfk_2` FOREIGN KEY (`produk_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `testimonials`
---
-ALTER TABLE `testimonials`
-  ADD CONSTRAINT `testimonials_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
