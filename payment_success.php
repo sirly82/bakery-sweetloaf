@@ -19,7 +19,10 @@ unset($_SESSION['order_details']);
       <img src="assets/images/checkmark.png" alt="Pembayaran Berhasil" />
     </div>
     <p class="success-message">Terima kasih! Pembayaran Anda telah diproses dengan sukses.</p>
-    <button id="goHomeBtn">Kembali ke Beranda</button>
+    <div class="button-container ">
+      <button id="goCetakBtn">Cetak Struk</button>
+      <button id="goHomeBtn">Kembali ke Beranda</button>
+    </div>
   </div>
 
   <script src="assets/js/payment_success.js"></script>

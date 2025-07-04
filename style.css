@@ -1,7 +1,10 @@
+/* Import Google Font Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
 /* Pastikan box-sizing agar padding/border tidak menambah lebar */
 *, *::before, *::after {
     box-sizing: border-box;
-}
+}    
 
 /* Definisi Variabel Warna dan Lainnya */
 :root {
@@ -17,7 +20,7 @@
     --border-radius-small: 8px;
     --border-radius-medium: 12px;
     --border-radius-large: 20px;
-}
+}    
 
 /* Header */
 header {
@@ -28,10 +31,7 @@ header {
     position: relative;
     z-index: 1000;
     overflow: hidden;
-}
-
-/* Import Google Font Poppins */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+}    
 
 /* General Reset & Body */
 body, h1, h2, h3, p, ul, li, a {
@@ -388,6 +388,7 @@ body {
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3; /* Tambahan properti standar */
     -webkit-box-orient: vertical;
 }
 

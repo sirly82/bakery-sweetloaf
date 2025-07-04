@@ -1,0 +1,46 @@
+/* ===== Button Container ===== */
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+/* ===== Button Styles ===== */
+#goHomeBtn, #goCetakBtn {
+  width: 200px;
+  text-align: center;
+  border: none;
+  padding: 12px 30px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+#goHomeBtn {
+  background-color: #FC8A06;
+  color: white;
+  box-shadow: 0 4px 12px rgba(252, 138, 6, 0.3);
+}
+
+#goHomeBtn:hover {
+  background-color: #e57603;
+  box-shadow: 0 6px 16px rgba(252, 138, 6, 0.4);
+  transform: translateY(-2px);
+}
+
+#goCetakBtn {
+  background-color: #0FA36B;
+  color: white;
+  box-shadow: 0 6px 16px rgba(15, 163, 107, 0.4);
+}
+
+#goCetakBtn:hover {
+  background-color: #0d8d5d;
+  box-shadow: 0 6px 16px rgba(15, 163, 107, 0.5);
+  transform: translateY(-2px);
+}
