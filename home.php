@@ -9,6 +9,8 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
+
+
 // Inisialisasi array untuk menyimpan produk
 $products = [];
 $best_sellers = []; // Tambahkan ini untuk menyimpan produk best seller
@@ -60,7 +62,7 @@ $conn->close();
 </head>
 <body>
     <div class="top-wave-container">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#FC8A06" fill-opacity="1" d="M0,320L1440,320L1440,0L0,0Z"></path></svg>
+        <img src="assets/border-atas.png">
     </div>
 
     <header class="main-header">
@@ -71,9 +73,7 @@ $conn->close();
         <nav class="main-nav">
             <ul>
                 <li><a href="home.php" class="nav-link active">Beranda</a></li>
-                <li><a href="pesanan.php" class="nav-link">Keranjang</a></li>
-                <li><a href="#" class="nav-link">Pesanan</a></li>
-                <li><a href="#" class="nav-link">Tentang Kami</a></li>
+                <li><a href="pesanan.php" class="nav-link">Pesanan</a></li>
                 <li><a href="#" class="nav-link">Kelola Akun</a></li>
                 <?php if (isset($_SESSION['username'])): // Tampilkan tombol keluar hanya jika sudah login ?>
                     <li>
@@ -202,7 +202,7 @@ $conn->close();
         <div class="container">
             <div class="footer-left">
                 <div class="logo">
-                    <img src="assets/SWEETLOAF.png" alt="SweetLoaf Bakery Logo">
+                    <img src="assets/logo.png" alt="SweetLoaf Bakery Logo">
                     </div>
                 <div class="social-media">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -214,7 +214,7 @@ $conn->close();
             <div class="footer-right">
                 <h4>Lokasi :</h4>
                 <div class="map-placeholder">
-                    <img src="assets/map-placeholder.png" alt="Map Location">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2592.211231097696!2d117.60250684784057!3d3.303678271356732!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32138bd956b83ecd%3A0x3868bdace8adf78b!2sSweetLoaf%20Bakery!5e0!3m2!1sid!2sid!4v1751377213866!5m2!1sid!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
         </div>
@@ -222,6 +222,6 @@ $conn->close();
             <p>ESKALA Copyright 2025. All Rights Reserved.</p>
         </div>
     </footer>
-    <script src="assets/js/cart.js"></script>
+    <script src="order.js"></script>
 </body>
 </html>
