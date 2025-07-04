@@ -117,9 +117,7 @@ $conn->close();
 </head>
 <body>
     <div class="top-wave-container">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-            <path fill="#FC8A06" fill-opacity="1" d="M0,288L80,266.7C160,245,320,203,480,186.7C640,171,800,181,960,165.3C1120,149,1280,107,1360,85.3L1440,64L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z"></path>
-        </svg>
+        <img src="assets/border-atas.png">
     </div>
 
     <header class="main-header">
@@ -128,24 +126,19 @@ $conn->close();
                 <img src="assets/logo-home.png" alt="SweetLoaf Logo">
             </div>
             <nav class="main-nav">
-                <ul class="nav-links">
+                <ul>
                     <li><a href="home.php" class="nav-link">Beranda</a></li>
-                    <li><a href="pesanan.php" class="nav-link active">Keranjang</a></li>
-                    <li><a href="#" class="nav-link">Pesanan</a></li>
-                    <li><a href="#" class="nav-link">Tentang Kami</a></li>
+                    <li><a href="pesanan.php" class="nav-link active">Pesanan</a></li>
                     <li><a href="#" class="nav-link">Kelola Akun</a></li>
-                </u>
+                    <?php if (isset($_SESSION['username'])): // Tampilkan tombol keluar hanya jika sudah login ?>
+                        <li>
+                            <a href="logout.php" class="btn-logout">
+                                <i class="fas fa-sign-out-alt"></i> Keluar
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
             </nav>
-            <div class="header-actions">
-                <a href="#" class="cart-icon"><i class="fas fa-shopping-cart"></i></a>
-                <div class="user-info">
-                    <span class="username"><?php echo htmlspecialchars($username); ?></span>
-                    <a href="logout.php" class="btn-logout">Logout</a>
-                </div>
-            </div>
-            <div class="menu-icon">
-                <i class="fas fa-bars"></i>
-            </div>
         </div>
     </header>
 
@@ -259,7 +252,7 @@ $conn->close();
         <div class="container">
             <div class="footer-left">
                 <div class="logo">
-                    <img src="assets/SWEETLOAF.png" alt="SweetLoaf Bakery Logo">
+                    <img src="assets/logo.png" alt="SweetLoaf Bakery Logo">
                 </div>
                 <div class="social-media">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -271,7 +264,7 @@ $conn->close();
             <div class="footer-right">
                 <h4>Lokasi :</h4>
                 <div class="map-placeholder">
-                    <img src="assets/map-placeholder.png" alt="Map Location">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2592.211231097696!2d117.60250684784057!3d3.303678271356732!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32138bd956b83ecd%3A0x3868bdace8adf78b!2sSweetLoaf%20Bakery!5e0!3m2!1sid!2sid!4v1751377213866!5m2!1sid!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
         </div>
