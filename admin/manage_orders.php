@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
         $message_type = "danger";
     } elseif (!empty($order_id)) {
         try {
-            $sql_update = "UPDATE pesanan SET status = ?, updated_at = CURRENT_TIMESTAMP() WHERE id_pesanan = ?";
+            $sql_update = "UPDATE pesanan SET payment_status = ?, updated_at = CURRENT_TIMESTAMP() WHERE order_id = ?";
             $stmt_update = $conn->prepare($sql_update);
             $stmt_update->bind_param("si", $new_status, $order_id);
 
@@ -48,7 +48,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 $orders = [];
 try {
     // Ambil pesanan, urutkan berdasarkan created_at terbaru, status 'Belum Diproses' di atas
-    $sql_orders = "SELECT id_pesanan, nama_pengguna, pesanan, total_item, total_harga, catatan, status, created_at, updated_at FROM pesanan ORDER BY FIELD(status, 'Belum Diproses', 'Sedang Diproses', 'Selesai'), created_at DESC";
+    $sql_orders = "SELECT 
+        p.order_id, 
+        u.name AS nama_pengguna, 
+        p.total AS total_harga,
+        p.payment_status AS status,
+        p.created_at, 
+        p.updated_at
+    FROM pesanan p
+    JOIN users u ON p.user_id = u.id
+    ORDER BY FIELD(p.payment_status, 'unpaid', 'paid', 'cancelled'), p.created_at DESC";
     $stmt_orders = $conn->prepare($sql_orders);
     $stmt_orders->execute();
     $result_orders = $stmt_orders->get_result();
@@ -112,9 +121,10 @@ $conn->close(); // Tutup koneksi setelah semua operasi database selesai
                         <?php if (!empty($orders)): ?>
                             <?php foreach ($orders as $order): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($order['id_pesanan']); ?></td>
+                                    <td><?php echo htmlspecialchars($order['order_id']); ?></td>
                                     <td><?php echo htmlspecialchars($order['nama_pengguna']); ?></td>
                                     <td><?php echo htmlspecialchars($order['pesanan']); ?></td>
+                                    <td><?php echo htmlspecialchars($order['status']); ?></td>
                                     <td><?php echo htmlspecialchars($order['total_item']); ?></td>
                                     <td>Rp <?php echo number_format($order['total_harga'], 0, ',', '.'); ?></td>
                                     <td><?php echo htmlspecialchars($order['catatan'] ?? '-'); ?></td>
@@ -128,7 +138,7 @@ $conn->close(); // Tutup koneksi setelah semua operasi database selesai
                                     <td class="actions">
                                         <form action="manage_orders.php" method="post" class="status-form">
                                             <input type="hidden" name="action" value="update_status">
-                                            <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($order['id_pesanan']); ?>">
+                                            <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($order['order_id']); ?>">
                                             <select name="new_status" class="status-select">
                                                 <option value="Belum Diproses" <?php echo ($order['status'] == 'Belum Diproses') ? 'selected' : ''; ?>>Belum Diproses</option>
                                                 <option value="Sedang Diproses" <?php echo ($order['status'] == 'Sedang Diproses') ? 'selected' : ''; ?>>Sedang Diproses</option>

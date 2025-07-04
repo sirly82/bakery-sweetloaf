@@ -27,6 +27,7 @@ $total_products = 0;
 $total_orders = 0;
 $total_customers = 0;
 $revenue_today = 0;
+$total_unpaid_orders = 0;
 
 // Contoh: Ambil jumlah total produk
 $sql_products = "SELECT COUNT(*) AS total FROM products";
@@ -52,12 +53,19 @@ if ($result_users && $result_users->num_rows > 0) {
     $total_customers = $row['total'];
 }
 
+$sql_unpaid = "SELECT COUNT(*) AS total FROM pesanan WHERE payment_status = 'unpaid'";
+$result_unpaid = $conn->query($sql_unpaid);
+if ($result_unpaid && $result_unpaid->num_rows > 0) {
+    $row_unpaid = $result_unpaid->fetch_assoc();
+    $total_unpaid_orders = $row_unpaid['total'];
+}
+
 // Contoh: Total pendapatan hari ini (asumsi ada kolom 'tanggal_pesanan' dan 'total_harga' di tabel 'pesanan')
 // Ini adalah contoh sederhana, mungkin perlu penyesuaian tergantung struktur tabel pesanan Anda.
 $today = date('Y-m-d'); // Ini akan menghasilkan tanggal hari ini dalam format YYYY-MM-DD (contoh: '2025-07-04')
 
 // Query untuk mengambil total pendapatan hari ini dari kolom 'created_at'
-$sql_revenue_today = "SELECT SUM(total_harga) AS total_revenue FROM pesanan WHERE DATE(created_at) = ?";
+$sql_revenue_today = "SELECT SUM(total) AS total_revenue FROM pesanan WHERE DATE(created_at) = ?";
 $stmt_revenue = $conn->prepare($sql_revenue_today);
 $stmt_revenue->bind_param("s", $today); // "s" karena $today adalah string
 $stmt_revenue->execute();
@@ -117,6 +125,11 @@ $conn->close();
                         <h3>Pendapatan Hari Ini</h3>
                         <p class="card-value">Rp <?php echo number_format($revenue_today, 0, ',', '.'); ?></p>
                         <a href="reports.php" class="card-link">Lihat Laporan <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="card">
+                        <h3>Pesanan Belum Dibayar</h3>
+                        <p class="card-value"><?php echo $total_unpaid_orders; ?></p>
+                        <a href="manage_orders.php?filter=unpaid" class="card-link">Lihat Detail <i class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
 
