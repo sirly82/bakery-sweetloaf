@@ -13,21 +13,25 @@ $message_type = '';
 // --- Logika untuk Mengubah Status Pesanan ---
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'update_status') {
     $order_id = filter_var($_POST['order_id'], FILTER_SANITIZE_NUMBER_INT);
-    $new_status = filter_var($_POST['new_status'], FILTER_SANITIZE_STRING);
 
-    // Validasi status yang diterima
-    $allowed_statuses = ['Belum Diproses', 'Sedang Diproses', 'Selesai'];
-    if (!in_array($new_status, $allowed_statuses)) {
+    // Validasi status pembayaran dan status pesanan
+    $allowed_payment_statuses = ['unpaid', 'paid', 'cancelled', 'refunded'];
+    $allowed_order_statuses = ['pending', 'on_progress', 'completed', 'cancelled'];
+
+    $new_payment_status = $_POST['payment_status'] ?? '';
+    $new_order_status = $_POST['order_status'] ?? '';
+
+    if (!in_array($new_payment_status, $allowed_payment_statuses) || !in_array($new_order_status, $allowed_order_statuses)) {
         $message = "Status tidak valid.";
         $message_type = "danger";
-    } elseif (!empty($order_id)) {
+    } else {
         try {
-            $sql_update = "UPDATE pesanan SET payment_status = ?, updated_at = CURRENT_TIMESTAMP() WHERE order_id = ?";
+            $sql_update = "UPDATE pesanan SET payment_status = ?, order_status = ?, updated_at = CURRENT_TIMESTAMP() WHERE order_id = ?";
             $stmt_update = $conn->prepare($sql_update);
-            $stmt_update->bind_param("si", $new_status, $order_id);
+            $stmt_update->bind_param("ssi", $new_payment_status, $new_order_status, $order_id);
 
             if ($stmt_update->execute()) {
-                $message = "Status pesanan ID #" . htmlspecialchars($order_id) . " berhasil diperbarui menjadi '" . htmlspecialchars($new_status) . "'.";
+                $message = "Status pesanan ID #" . htmlspecialchars($order_id) . " berhasil diperbarui.";
                 $message_type = "success";
             } else {
                 $message = "Gagal memperbarui status pesanan: " . $stmt_update->error;
@@ -38,9 +42,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             $message = "Error: " . $e->getMessage();
             $message_type = "danger";
         }
-    } else {
-        $message = "ID Pesanan tidak valid.";
-        $message_type = "danger";
     }
 }
 
@@ -52,7 +53,8 @@ try {
         p.order_id, 
         u.name AS nama_pengguna, 
         p.total AS total_harga,
-        p.payment_status AS status,
+        p.payment_status,
+        p.order_status,
         p.created_at, 
         p.updated_at
     FROM pesanan p
@@ -64,6 +66,40 @@ try {
 
     if ($result_orders->num_rows > 0) {
         while ($row = $result_orders->fetch_assoc()) {
+            // Ambil detail item dari pesanan_items
+            $detail_items = [];
+            $total_item = 0;
+
+            $sql_items = "
+                SELECT pi.jumlah, pr.nama
+                FROM pesanan_items pi
+                JOIN products pr ON pi.produk_id = pr.id
+                WHERE pi.pesanan_id = ?
+            ";
+            $stmt_items = $conn->prepare($sql_items);
+            $stmt_items->bind_param("i", $row['order_id']);
+            $stmt_items->execute();
+            $result_items = $stmt_items->get_result();
+
+            while ($item = $result_items->fetch_assoc()) {
+                $total_item += (int)$item['jumlah'];
+                $detail_items[] = $item['nama'] . " (" . $item['jumlah'] . ")";
+            }
+
+            $stmt_items->close();
+
+            // Tambahkan data ke array pesanan
+            $row['detail_pesanan'] = implode(', ', $detail_items);
+            $row['total_item'] = $total_item;
+
+            // Optional: Jika tabel `pesanan` punya kolom `catatan`, ganti ini
+            $row['catatan'] = $row['catatan'] ?? '-';
+
+            // Handle null updated_at agar tidak error strtotime(null)
+            if (empty($row['updated_at'])) {
+                $row['updated_at'] = null;
+            }
+
             $orders[] = $row;
         }
     }
@@ -111,10 +147,10 @@ $conn->close(); // Tutup koneksi setelah semua operasi database selesai
                             <th>Total Item</th>
                             <th>Total Harga</th>
                             <th>Catatan</th>
-                            <th>Status</th>
                             <th>Waktu Pesan</th>
                             <th>Terakhir Diperbarui</th>
-                            <th>Aksi</th>
+                            <th>Status Pembayaran</th>
+                            <th>Status Pesanan</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -123,29 +159,28 @@ $conn->close(); // Tutup koneksi setelah semua operasi database selesai
                                 <tr>
                                     <td><?php echo htmlspecialchars($order['order_id']); ?></td>
                                     <td><?php echo htmlspecialchars($order['nama_pengguna']); ?></td>
-                                    <td><?php echo htmlspecialchars($order['pesanan']); ?></td>
-                                    <td><?php echo htmlspecialchars($order['status']); ?></td>
+                                    <td><?php echo htmlspecialchars($order['detail_pesanan']); ?></td>
                                     <td><?php echo htmlspecialchars($order['total_item']); ?></td>
                                     <td>Rp <?php echo number_format($order['total_harga'], 0, ',', '.'); ?></td>
                                     <td><?php echo htmlspecialchars($order['catatan'] ?? '-'); ?></td>
-                                    <td>
-                                        <span class="status-badge status-<?php echo strtolower(str_replace(' ', '-', $order['status'])); ?>">
-                                            <?php echo htmlspecialchars($order['status']); ?>
-                                        </span>
-                                    </td>
                                     <td><?php echo date('d M Y H:i', strtotime($order['created_at'])); ?></td>
-                                    <td><?php echo date('d M Y H:i', strtotime($order['updated_at'])); ?></td>
-                                    <td class="actions">
-                                        <form action="manage_orders.php" method="post" class="status-form">
-                                            <input type="hidden" name="action" value="update_status">
-                                            <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($order['order_id']); ?>">
-                                            <select name="new_status" class="status-select">
-                                                <option value="Belum Diproses" <?php echo ($order['status'] == 'Belum Diproses') ? 'selected' : ''; ?>>Belum Diproses</option>
-                                                <option value="Sedang Diproses" <?php echo ($order['status'] == 'Sedang Diproses') ? 'selected' : ''; ?>>Sedang Diproses</option>
-                                                <option value="Selesai" <?php echo ($order['status'] == 'Selesai') ? 'selected' : ''; ?>>Selesai</option>
-                                            </select>
-                                            <button type="submit" class="btn-update-status" title="Update Status"><i class="fas fa-sync"></i></button>
-                                        </form>
+                                    <td><?php echo $order['updated_at'] ? date('d M Y H:i', strtotime($order['updated_at'])) : '-'; ?></td>
+                                    <td>
+                                        <select class="status-pembayaran" data-id="<?= $order['order_id'] ?>">
+                                            <option value="unpaid" <?= $order['payment_status'] == 'unpaid' ? 'selected' : '' ?>>Belum Dibayar</option>
+                                            <option value="paid" <?= $order['payment_status'] == 'paid' ? 'selected' : '' ?>>Sudah Dibayar</option>
+                                            <option value="cancelled" <?= $order['payment_status'] == 'cancelled' ? 'selected' : '' ?>>Dibatalkan</option>
+                                            <option value="refunded" <?= $order['payment_status'] == 'refunded' ? 'selected' : '' ?>>Dikembalikan</option>
+                                        </select>
+                                    </td>
+
+                                    <td>
+                                        <select class="status-pesanan" data-id="<?= $order['order_id'] ?>">
+                                            <option value="pending" <?= $order['order_status'] == 'pending' ? 'selected' : '' ?>>Menunggu</option>
+                                            <option value="on_progress" <?= $order['order_status'] == 'on_progress' ? 'selected' : '' ?>>Sedang Diproses</option>
+                                            <option value="completed" <?= $order['order_status'] == 'completed' ? 'selected' : '' ?>>Selesai</option>
+                                            <option value="cancelled" <?= $order['order_status'] == 'cancelled' ? 'selected' : '' ?>>Dibatalkan</option>
+                                        </select>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -164,4 +199,5 @@ $conn->close(); // Tutup koneksi setelah semua operasi database selesai
     </div>
 
     </body>
+    <script src="assets/js/manage_status.js"></script>
 </html>

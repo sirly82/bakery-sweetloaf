@@ -1297,3 +1297,49 @@ body.login-page .wrapper {
     color: var(--medium-grey);
     padding: 20px;
 }
+
+.status-select {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.btn-update-status {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn-update-status:hover {
+    background-color: #2980b9;
+}
+
+select.status-pembayaran,
+select.status-pesanan {
+  background-color: #f0f8ff;
+  border: 1px solid #999;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+  transition: 0.2s;
+}
+
+select.status-pembayaran:hover,
+select.status-pesanan:hover {
+  background-color: #e6f0fa;
+  border-color: #666;
+}
+
+select.status-pembayaran:focus,
+select.status-pesanan:focus {
+  outline: none;
+  border-color: #3399ff;
+  box-shadow: 0 0 0 2px rgba(51,153,255,0.3);
+}
