@@ -1,7 +1,6 @@
 <?php
 session_start();
-// Optional: bersihkan session setelah selesai transaksi
-unset($_SESSION['order_details']);
+unset($_SESSION['order_submitted']); // Reset agar bisa order lagi
 ?>
 
 <!DOCTYPE html>

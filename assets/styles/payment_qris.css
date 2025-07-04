@@ -47,3 +47,10 @@ button {
 button:hover {
     background-color: #e57904;
 }
+
+.payment-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}

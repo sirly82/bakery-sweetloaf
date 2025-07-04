@@ -1,0 +1,54 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #fff8f0;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    color: #333;
+}
+
+.processed-container {
+    max-width: 600px;
+    margin: 100px auto;
+    padding: 40px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border-radius: 16px;
+}
+
+.processed-title {
+    font-size: 28px;
+    color: #27ae60;
+    margin-bottom: 15px;
+}
+
+.processed-message {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 25px;
+}
+
+.processed-icon img {
+    width: 180px;
+    margin-bottom: 30px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+}
+
+#goHomeBtn {
+    background-color: #FC8A06;
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#goHomeBtn:hover {
+    background-color: #e57900;
+}

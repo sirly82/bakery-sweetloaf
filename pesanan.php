@@ -1,24 +1,30 @@
 <?php
 session_start();
-require 'db_connect.php'; // Pastikan path ke db_connect.php benar
-
+require 'db_connect.php';
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-// session_start();
-// ... sisa kode pesanan.php
 
-
-
-// Cek apakah user sudah login, jika belum redirect ke login page
-if (!isset($_SESSION['id'])) { // Gunakan user_id untuk identifikasi unik
+if (!isset($_SESSION['id'])) {
     header("Location: login.php");
     exit();
 }
 
 $user_id = $_SESSION['id'];
 $username = $_SESSION['username'];
+
+// Cek apakah user baru saja melakukan checkout
+if (isset($_SESSION['checkout_completed']) && $_SESSION['checkout_completed'] === true) {
+    // Hapus data keranjang dari database
+    $clear_cart_stmt = $conn->prepare("DELETE FROM keranjang WHERE user_id = ?");
+    $clear_cart_stmt->bind_param("i", $user_id);
+    $clear_cart_stmt->execute();
+    $clear_cart_stmt->close();
+
+    // Reset flag agar user bisa menambahkan item baru
+    unset($_SESSION['checkout_completed']);
+}
 
 // Ambil semua data profil sekaligus
 $stmt_user = $conn->prepare("SELECT name, phone, address FROM users WHERE id = ?");
@@ -28,24 +34,19 @@ $result_user = $stmt_user->get_result();
 
 if ($result_user->num_rows > 0) {
     $user_data = $result_user->fetch_assoc();
-    $nama_user = $user_data['name'];  // Pastikan kolom di database namanya 'name'
+    $nama_user = $user_data['name'];
     $telepon_user = $user_data['phone'];
     $alamat_user = $user_data['address'];
-    
-    // Update session untuk dipakai nanti
     $_SESSION['name'] = $nama_user;
 } else {
-    // Beri nilai default jika data tidak ditemukan
     $nama_user = '';
     $telepon_user = '';
     $alamat_user = '';
 }
 $stmt_user->close();
 
-// Ambil dari session jika ada
 $nama_user = $_SESSION['name'] ?? '';
 
-// Jika nama kosong, ambil dari database
 if (empty($nama_user)) {
     $stmt = $conn->prepare("SELECT name FROM users WHERE id = ?");
     $stmt->bind_param("i", $_SESSION['id']);
@@ -53,12 +54,11 @@ if (empty($nama_user)) {
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {
         $nama_user = $result->fetch_assoc()['name'];
-        $_SESSION['name'] = $nama_user;  // Simpan ke session
+        $_SESSION['name'] = $nama_user;
     }
     $stmt->close();
 }
 
-// Ambil item dari keranjang belanja pengguna
 $cart_items = [];
 $grand_total = 0;
 
@@ -93,15 +93,13 @@ if ($result_cart->num_rows > 0) {
     }
 }
 
-// Debug hanya di development environment
 if (isset($_GET['debug']) && $_GET['debug'] == 'true') {
-    echo '<pre style="display:none;">'; // Sembunyikan secara default
+    echo '<pre style="display:none;">';
     print_r($cart_items);
     echo '</pre>';
 }
 
 $stmt_cart->close();
-
 $conn->close();
 ?>
 
@@ -238,8 +236,9 @@ $conn->close();
 
                             <input type="hidden" name="total_harga" value="<?php echo $grand_total; ?>">
                             <?php foreach ($cart_items as $index => $item): ?>
+                                <input type="hidden" name="items[<?php echo $index; ?>][produk_id]" value="<?php echo $item['produk_id']; ?>">
                                 <input type="hidden" name="items[<?php echo $index; ?>][nama_produk]" value="<?php echo htmlspecialchars($item['nama_produk']); ?>">
-                                <input type="hidden" name="items[<?php echo $index; ?>][harga_satuan]" value="<?php echo $item['harga_satuan']; ?>">
+                                <input type="hidden" name="items[<?php echo $index; ?>][harga]" value="<?php echo $item['harga_satuan']; ?>">
                                 <input type="hidden" name="items[<?php echo $index; ?>][jumlah]" value="<?php echo $item['jumlah']; ?>">
                                 <input type="hidden" name="items[<?php echo $index; ?>][subtotal]" value="<?php echo $item['subtotal']; ?>">
                             <?php endforeach; ?>

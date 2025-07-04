@@ -1,6 +1,6 @@
 <?php
+date_default_timezone_set('Asia/Jakarta');
 session_start();
-require 'db_connect.php';
 
 if (!isset($_SESSION['id']) || !isset($_SESSION['order_details'])) {
     header("Location: login.php");
@@ -8,6 +8,15 @@ if (!isset($_SESSION['id']) || !isset($_SESSION['order_details'])) {
 }
 
 $order_details = $_SESSION['order_details'];
+
+// Saat tombol "Tutup Halaman" ditekan
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_order'])) {
+    // Jangan simpan ke database lagi, cukup redirect
+    unset($_SESSION['order_details']); // Bersihkan session order agar tidak bisa diulang
+    $_SESSION['order_submitted'] = true;
+    header("Location: payment_success.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -33,7 +42,14 @@ $order_details = $_SESSION['order_details'];
         </div>
         
         <p>Setelah pembayaran berhasil, Anda akan menerima notifikasi via email/WhatsApp.</p>
-        <button id="finishPaymentBtn">Tutup Halaman</button>
+        <div class="payment-buttons">
+            <button id="changeMethodBtn">Bayar Cash</button>
+            <form method="POST" style="text-align:center;">
+                <input type="hidden" name="save_order" value="1">
+                <button type="submit" id="finishPaymentBtn">Tutup Halaman</button>
+            </form>
+            <!-- <button id="finishPaymentBtn">Tutup Halaman</button> -->
+        </div>
     </div>
 </body>
 <script src="assets/js/payment_qris.js"></script>
