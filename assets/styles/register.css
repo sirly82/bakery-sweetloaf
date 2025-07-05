@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
-  background-image: url('assets/bg-login.png');
+  background-image: url('../images/bg-login.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

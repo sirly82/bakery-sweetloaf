@@ -40,10 +40,9 @@ try {
     <link rel="stylesheet" href="assets/styles/history.css">
 </head>
 <body>
-    <header>
-        <img src="assets/SWEETLOAF.png" alt="Logo Bakery">
-        <h1>SweetLoaf Bakery</h1>
-    </header>
+    <div class="top-wave-container">
+        <img src="assets/images/border-atas.png">
+    </div>
 
     <nav>
         <ul>
@@ -51,6 +50,7 @@ try {
             <li><a href="pesanan.php">Keranjang</a></li>
             <li><a href="history.php">Pesanan</a></li>
             <li><a href="about.php">Tentang Kami</a></li>
+            <li><a href="kelola_akun.php">Kelola Akun</a></li>
             <li><a href="logout.php" class="logout">Logout</a></li>
         </ul>
     </nav>

@@ -60,18 +60,18 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SweetLoaf Bakery - Beranda</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/styles/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="top-wave-container">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#FC8A06" fill-opacity="1" d="M0,320L1440,320L1440,0L0,0Z"></path></svg>
+        <img src="assets/images/border-atas.png">
     </div>
 
     <header class="main-header">
     <div class="container">
         <div class="logo">
-            <img src="assets/logo-home.png" alt="SweetLoaf Bakery Logo">
+            <img src="assets/images/logo-home.png" alt="SweetLoaf Bakery Logo">
             </div>
         <nav class="main-nav">
             <ul>
@@ -210,7 +210,7 @@ $conn->close();
         <div class="container">
             <div class="footer-left">
                 <div class="logo">
-                    <img src="assets/logo.png" alt="SweetLoaf Bakery Logo">
+                    <img src="assets/images/logo.png" alt="SweetLoaf Bakery Logo">
                     </div>
                 <div class="social-media">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>

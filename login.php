@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       margin: 0;
       font-family: 'Poppins', sans-serif;
       /* Background image sudah ada di register.css yang terhubung */
-      background-image: url('assets/bg-login.png'); /* Pastikan path ini benar jika tidak dari CSS */
+      background-image: url('assets/images/bg-login.png'); /* Pastikan path ini benar jika tidak dari CSS */
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -221,7 +221,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   <div class="login-container">
     <div class="logo">
-      <img src="assets/logo.png" alt="SweetLoaf Logo">
+      <img src="assets/images/logo.png" alt="SweetLoaf Logo">
     </div>
     <h3>Masuk ke akun Anda</h3>
 

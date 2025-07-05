@@ -22,7 +22,7 @@ $pesanan = [];
 </head>
 <body>
     <header>
-        <img src="assets/SWEETLOAF.png" alt="Logo Bakery">
+        <img src="assets/images/SWEETLOAF.png" alt="Logo Bakery">
         <h1>SweetLoaf Bakery</h1>
     </header>
     <nav>
@@ -31,14 +31,15 @@ $pesanan = [];
             <li><a href="pesanan.php">Keranjang</a></li>
             <li><a href="history.php">Pesanan</a></li>
             <li><a href="about.php">Tentang Kami</a></li>
+            <li><a href="kelola_akun.php">Kelola Akun</a></li>
             <li><a href="logout.php" class="logout">Logout</a></li>
         </ul>
     </nav>
     <main>
         <section class="about">
-            <h2>Tentang Cake of The Box</h2>
+            <h2>Tentang SweetLoaf Bakery</h2>
             <p>
-                Cake of The Box adalah toko bakery online yang berdedikasi untuk menghadirkan 
+                SweetLoaf Bakery adalah toko bakery online yang berdedikasi untuk menghadirkan 
                 kue-kue segar dan lezat langsung ke pintu rumah Anda. Kami memulai perjalanan 
                 ini dengan semangat untuk menyajikan kebahagiaan melalui setiap gigitan.
             </p>
@@ -67,11 +68,8 @@ $pesanan = [];
         </section>
     </main>
     <footer>
-        <div class="footer-content">
-            <p>&copy; 2024 Cake of The Box. All Rights Reserved.</p>
-            <ul>
-                <li><a href="privacy.php">Kebijakan Privasi</a></li>
-            </ul>
+        <div class="copyright">
+            <p>ESKALA Copyright 2025. All Rights Reserved.</p>
         </div>
     </footer>
 </body>
