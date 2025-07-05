@@ -27,7 +27,7 @@ $_SESSION['checkout_completed'] = true;
         <!-- <p class="processed-message">Pesanan Anda telah diterima. Silakan tunggu konfirmasi dari kami.</p> -->
 
         <div class="processed-icon">
-            <img src="assets/images/order-processing.png" alt="Sedang Diproses">
+            <img src="assets/images/checkmark.png" alt="Sedang Diproses">
         </div>
 
         <div class="button-container">
