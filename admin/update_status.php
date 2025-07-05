@@ -16,9 +16,17 @@ if (!$order_id) {
     exit;
 }
 
+// Update Payment Status
 if (isset($_POST['payment_status'])) {
     $status = $_POST['payment_status'];
-    $stmt = $conn->prepare("UPDATE pesanan SET payment_status = ?, updated_at = NOW() WHERE order_id = ?");
+
+    if ($status === 'paid') {
+        // Jika dibayar, update juga paid_at
+        $stmt = $conn->prepare("UPDATE pesanan SET payment_status = ?, paid_at = NOW(), updated_at = NOW() WHERE order_id = ?");
+    } else {
+        // Jika bukan 'paid', kosongkan paid_at
+        $stmt = $conn->prepare("UPDATE pesanan SET payment_status = ?, paid_at = NULL, updated_at = NOW() WHERE order_id = ?");
+    }
 
     if ($stmt === false) {
         http_response_code(500);
@@ -37,7 +45,7 @@ if (isset($_POST['payment_status'])) {
     exit;
 }
 
-
+// Update Order Status
 if (isset($_POST['order_status'])) {
     $status = $_POST['order_status'];
     $stmt = $conn->prepare("UPDATE pesanan SET order_status = ?, updated_at = NOW() WHERE order_id = ?");

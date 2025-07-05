@@ -16,6 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
     $username = trim($_POST['username'] ?? '');
     $name = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
     $role = $_POST['role'] ?? 'user'; // Default role
     $password = $_POST['password'] ?? '';
     $user_id = $_POST['user_id'] ?? null;
@@ -29,8 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
         if ($action == 'add') {
             // Tambah Pengguna Baru
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("INSERT INTO users (username, password, name, role) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("ssss", $username, $hashed_password, $name, $role);
+            $stmt = $conn->prepare("INSERT INTO users (username, email, phone, password, name, role) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssss", $username, $email, $phone, $hashed_password, $name, $role);
             if ($stmt->execute()) {
                 $message = "Pengguna baru '{$username}' berhasil ditambahkan.";
             } else {
@@ -43,9 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
             $stmt->close();
         } elseif ($action == 'edit' && $user_id) {
             // Edit Pengguna
-            $sql = "UPDATE users SET username = ?, name = ?, role = ?";
-            $params = "sss";
-            $bind_values = [$username, $name, $role];
+            $sql = "UPDATE users SET username = ?, name = ?, email = ?, phone = ?, role = ?";
+            $params = "sssss";
+            $bind_values = [$username, $name, $email, $phone, $role];
 
             if (!empty($password)) {
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
@@ -85,14 +87,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['action']) && $_GET['acti
     if ($user_id_to_delete == $_SESSION['admin_id']) {
         $error = "Anda tidak bisa menghapus akun Anda sendiri!";
     } else {
-        $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
-        $stmt->bind_param("i", $user_id_to_delete);
-        if ($stmt->execute()) {
-            $message = "Pengguna berhasil dihapus.";
+        // Cek apakah user memiliki pesanan terlebih dahulu
+        $stmt_check = $conn->prepare("SELECT COUNT(*) FROM pesanan WHERE user_id = ?");
+        $stmt_check->bind_param("i", $user_id_to_delete);
+        $stmt_check->execute();
+        $stmt_check->bind_result($pesanan_count);
+        $stmt_check->fetch();
+        $stmt_check->close();
+
+        if ($pesanan_count > 0) {
+            $error = "Gagal menghapus pengguna karena memiliki data pesanan terkait.";
         } else {
-            $error = "Gagal menghapus pengguna: " . $stmt->error;
+            $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+            $stmt->bind_param("i", $user_id_to_delete);
+            if ($stmt->execute()) {
+                $message = "Pengguna berhasil dihapus.";
+            } else {
+                $error = "Gagal menghapus pengguna.";
+            }
+            $stmt->close();
         }
-        $stmt->close();
     }
 }
 
@@ -105,8 +119,6 @@ if ($result_users && $result_users->num_rows > 0) {
         $users[] = $row;
     }
 }
-
-$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -249,9 +261,7 @@ $conn->close();
                     $edit_user = null;
                     if (isset($_GET['edit_id'])) {
                         $edit_id = $_GET['edit_id'];
-                        // Re-establish connection for fetching edit data if connection was closed
-                        require_once '../db_connect.php';
-                        $stmt_edit = $conn->prepare("SELECT id, username, name, role FROM users WHERE id = ?");
+                        $stmt_edit = $conn->prepare("SELECT id, username, name, email, phone, role FROM users WHERE id = ?");
                         $stmt_edit->bind_param("i", $edit_id);
                         $stmt_edit->execute();
                         $result_edit = $stmt_edit->get_result();
@@ -259,7 +269,6 @@ $conn->close();
                             $edit_user = $result_edit->fetch_assoc();
                         }
                         $stmt_edit->close();
-                        $conn->close(); // Close connection after fetching
                     }
                     ?>
                     <form action="manage_users.php" method="post">
@@ -274,6 +283,16 @@ $conn->close();
                             <?php if (isset($edit_user)): ?>
                                 <small>Username tidak bisa diubah.</small>
                             <?php endif; ?>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="text" id="email" name="email" value="<?php echo htmlspecialchars($edit_user['email'] ?? ''); ?>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">No. Telepon:</label>
+                            <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($edit_user['phone'] ?? ''); ?>" required>
                         </div>
 
                         <div class="form-group">
@@ -339,5 +358,6 @@ $conn->close();
         <?php require_once 'includes/admin_footer.php'; ?>
     </div>
     <script src="admin.js"></script>
+    <?php $conn->close(); ?>
 </body>
 </html>

@@ -17,6 +17,26 @@ $revenue_this_year = 0;
 $total_orders = 0;
 $recent_orders = [];
 
+// Produk Terlaris (Top Selling Products)
+$top_products = [];
+
+$sql_top_products = "
+    SELECT pr.nama, SUM(pi.jumlah) AS total_terjual
+    FROM pesanan_items pi
+    JOIN products pr ON pi.produk_id = pr.id
+    JOIN pesanan p ON pi.pesanan_id = p.order_id
+    WHERE p.order_status = 'completed'
+    GROUP BY pi.produk_id
+    ORDER BY total_terjual DESC
+    LIMIT 5
+";
+$result_top_products = $conn->query($sql_top_products);
+if ($result_top_products && $result_top_products->num_rows > 0) {
+    while ($row = $result_top_products->fetch_assoc()) {
+        $top_products[] = $row;
+    }
+}
+
 // Total Pendapatan Keseluruhan
 $sql_total_revenue = "SELECT SUM(total) AS total FROM pesanan WHERE order_status = 'completed'";
 $result_total_revenue = $conn->query($sql_total_revenue);
@@ -135,10 +155,27 @@ $conn->close();
 
                 <div class="report-details-section">
                     <div class="detail-card">
-                        <h3>Produk Terlaris (Tidak Tersedia)</h3>
-                        <p class="no-data-message">
-                            Produk terlaris tidak tersedia karena struktur database tidak mendukung penghitungan ini secara langsung. Disarankan membuat tabel `order_items`.
-                        </p>
+                        <h3>Produk Terlaris</h3>
+                        <?php if (!empty($top_products)): ?>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Produk</th>
+                                        <th>Jumlah Terjual</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($top_products as $product): ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($product['nama']); ?></td>
+                                            <td><?php echo htmlspecialchars($product['total_terjual']); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        <?php else: ?>
+                            <p class="no-data-message">Belum ada data penjualan produk.</p>
+                        <?php endif; ?>
                     </div>
 
                     <div class="detail-card">
