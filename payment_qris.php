@@ -9,13 +9,43 @@ if (!isset($_SESSION['id']) || !isset($_SESSION['order_details'])) {
 
 $order_details = $_SESSION['order_details'];
 
-// Saat tombol "Tutup Halaman" ditekan
+// Saat user klik "Tutup Halaman" (artinya dianggap sudah bayar QRIS)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_order'])) {
-    // Jangan simpan ke database lagi, cukup redirect
-    unset($_SESSION['order_details']); // Bersihkan session order agar tidak bisa diulang
-    $_SESSION['order_submitted'] = true;
-    header("Location: payment_success.php");
-    exit();
+    require 'db_connect.php';
+
+    $user_id = $_SESSION['id'];
+    $order = $_SESSION['order_details'];
+    $order_ref = 'ORD' . time();
+    $total = $order['total_harga'];
+    $created_at = date('Y-m-d H:i:s');
+    $payment_status = 'unpaid';
+    $order_status = 'on_progress';
+    $payment_type = 'qris';
+    $paid_at = NULL;
+
+    try {
+        $stmt = $conn->prepare("INSERT INTO pesanan (user_id, order_ref, total, payment_type, payment_status, order_status, created_at, paid_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("isdsssss", $user_id, $order_ref, $total, $payment_type, $payment_status, $order_status, $created_at, $paid_at);
+        $stmt->execute();
+        $pesanan_id = $stmt->insert_id;
+
+        $stmt_item = $conn->prepare("INSERT INTO pesanan_items (pesanan_id, produk_id, jumlah, harga) VALUES (?, ?, ?, ?)");
+        foreach ($order['items'] as $item) {
+            $stmt_item->bind_param("iiid", $pesanan_id, $item['produk_id'], $item['jumlah'], $item['harga']);
+            $stmt_item->execute();
+        }
+
+        $_SESSION['last_order_id'] = $pesanan_id;
+        $_SESSION['checkout_completed'] = true;
+        unset($_SESSION['order_details']);
+        $_SESSION['order_submitted'] = true;
+
+        header("Location: payment_success.php");
+        exit();
+    } catch (Exception $e) {
+        echo "<pre>Gagal menyimpan pesanan QRIS: " . $e->getMessage() . "</pre>";
+        exit();
+    }
 }
 ?>
 
@@ -44,11 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_order'])) {
         <p>Setelah pembayaran berhasil, Anda akan menerima notifikasi via email/WhatsApp.</p>
         <div class="payment-buttons">
             <button id="changeMethodBtn">Bayar Cash</button>
-            <form method="POST" style="text-align:center;">
-                <input type="hidden" name="save_order" value="1">
-                <button type="submit" id="finishPaymentBtn">Tutup Halaman</button>
-            </form>
-            <!-- <button id="finishPaymentBtn">Tutup Halaman</button> -->
+            <button type="button" id="finishPaymentBtn">Tutup Halaman</button>
         </div>
     </div>
 </body>

@@ -2,6 +2,11 @@
 session_start();
 require 'db_connect.php';
 
+function safe_html($str) {
+    return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8');
+}
+
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -129,9 +134,9 @@ $conn->close();
                 <ul class="nav-links">
                     <li><a href="home.php" class="nav-link">Beranda</a></li>
                     <li><a href="pesanan.php" class="nav-link active">Keranjang</a></li>
-                    <li><a href="#" class="nav-link">Pesanan</a></li>
-                    <li><a href="#" class="nav-link">Tentang Kami</a></li>
-                    <li><a href="#" class="nav-link">Kelola Akun</a></li>
+                    <li><a href="history.php" class="nav-link">Pesanan</a></li>
+                    <li><a href="about.php" class="nav-link">Tentang Kami</a></li>
+                    <li><a href="kelola_akun.php" class="nav-link">Kelola Akun</a></li>
                 </u>
             </nav>
             <div class="header-actions">
@@ -229,8 +234,11 @@ $conn->close();
                             
                             <div class="form-group">
                                 <label for="alamat_pengiriman" class="form-label">Alamat Pengiriman:</label>
+                                <?php
+                                $alamat_safe = htmlspecialchars($alamat_user ?? '', ENT_QUOTES, 'UTF-8');
+                                ?>
                                 <textarea id="alamat_pengiriman" name="alamat_pengiriman" rows="3" 
-                                        class="form-textarea" required><?php echo htmlspecialchars($alamat_user); ?></textarea>
+                                    class="form-textarea" required><?php echo $alamat_safe; ?></textarea>
                                 <small class="form-note">* Pastikan alamat sudah benar</small>
                             </div>
 

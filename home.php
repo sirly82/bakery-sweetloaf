@@ -9,6 +9,11 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
+$notif = '';
+if (isset($_GET['update']) && $_GET['update'] === 'success') {
+    $notif = 'Profil berhasil diperbarui!';
+}
+
 // Inisialisasi array untuk menyimpan produk
 $products = [];
 $best_sellers = []; // Tambahkan ini untuk menyimpan produk best seller
@@ -72,9 +77,9 @@ $conn->close();
             <ul>
                 <li><a href="home.php" class="nav-link active">Beranda</a></li>
                 <li><a href="pesanan.php" class="nav-link">Keranjang</a></li>
-                <li><a href="#" class="nav-link">Pesanan</a></li>
-                <li><a href="#" class="nav-link">Tentang Kami</a></li>
-                <li><a href="#" class="nav-link">Kelola Akun</a></li>
+                <li><a href="history.php" class="nav-link">Pesanan</a></li>
+                <li><a href="about.php" class="nav-link">Tentang Kami</a></li>
+                <li><a href="kelola_akun.php" class="nav-link">Kelola Akun</a></li>
                 <?php if (isset($_SESSION['username'])): // Tampilkan tombol keluar hanya jika sudah login ?>
                     <li>
                         <a href="logout.php" class="btn-logout">
@@ -90,6 +95,9 @@ $conn->close();
     <main>
         <section class="hero-section">
             <div class="container">
+                <?php if (!empty($notif)): ?>
+                    <div class="notif success"><?= htmlspecialchars($notif) ?></div>
+                <?php endif; ?>
                 <div class="hero-content">
                     <p>Lagi ngidam yang manis-manis? Kue kami siap mengobati!</p>
                     <h1>Cinta Pada Gigitan Pertama,</h1>
@@ -202,7 +210,7 @@ $conn->close();
         <div class="container">
             <div class="footer-left">
                 <div class="logo">
-                    <img src="assets/SWEETLOAF.png" alt="SweetLoaf Bakery Logo">
+                    <img src="assets/logo.png" alt="SweetLoaf Bakery Logo">
                     </div>
                 <div class="social-media">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -214,7 +222,7 @@ $conn->close();
             <div class="footer-right">
                 <h4>Lokasi :</h4>
                 <div class="map-placeholder">
-                    <img src="assets/map-placeholder.png" alt="Map Location">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2592.211231097696!2d117.60250684784057!3d3.303678271356732!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32138bd956b83ecd%3A0x3868bdace8adf78b!2sSweetLoaf%20Bakery!5e0!3m2!1sid!2sid!4v1751377213866!5m2!1sid!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
         </div>
@@ -222,6 +230,7 @@ $conn->close();
             <p>ESKALA Copyright 2025. All Rights Reserved.</p>
         </div>
     </footer>
+
     <script src="assets/js/cart.js"></script>
 </body>
 </html>

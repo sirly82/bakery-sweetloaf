@@ -2,6 +2,18 @@
 session_start();
 require 'db_connect.php';
 
+$DEBUG_MODE = true;
+
+if ($DEBUG_MODE) {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+} else {
+    ini_set('display_errors', 0);
+    error_reporting(0);
+}
+
 if (!isset($_SESSION['id'])) {
     header("Location: login.php");
     exit();
@@ -10,14 +22,17 @@ if (!isset($_SESSION['id'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['submit_order'])) {
         // Data pengiriman
-        $nama_penerima = $_POST['nama_penerima'];
-        $nomor_telepon = $_POST['nomor_telepon'];
-        $alamat_pengiriman = $_POST['alamat_pengiriman'];
-        $total_harga = $_POST['total_harga'];
+        $nama_penerima = $_POST['nama_penerima'] ?? '';
+        $nomor_telepon = $_POST['nomor_telepon'] ?? '';
+        $alamat_pengiriman = $_POST['alamat_pengiriman'] ?? '';
+        $total_harga = $_POST['total_harga'] ?? '';
+        $items = $_POST['items'] ?? [];
 
         // Validasi sederhana
         if (empty($nama_penerima) || empty($nomor_telepon) || empty($alamat_pengiriman)) {
             $error_message = "Semua data pengiriman harus diisi.";
+        } elseif (empty($items) || !is_array($items)) {
+            $error_message = "Data produk tidak valid.";
         } else {
             $_SESSION['order_details'] = [
                 'nama_penerima' => $nama_penerima,
@@ -26,15 +41,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'total_harga' => $total_harga,
                 'items' => $_POST['items']
             ];
-
-            echo "<pre>POST items:\n";
-            print_r($_POST['items']);
-            echo "</pre>";
             
             header("Location: pembayaran.php");
             exit();
         }
-    } elseif (isset($_POST['payment_method'])) {
+    }
+    
+    if (isset($_POST['payment_method'])) {
+        if (!isset($_SESSION['order_details']) || empty($_SESSION['order_details']['items'])) {
+            die("Data order tidak ditemukan. Silakan ulangi proses.");
+        }
+
         $selected_method = $_POST['payment_method'];
         $_SESSION['order_details']['payment_method'] = $selected_method;
 
@@ -44,14 +61,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $total = $order['total_harga'];
         $created_at = date('Y-m-d H:i:s');
 
-        // Simpan ke tabel pesanan
-        $stmt = $conn->prepare("INSERT INTO pesanan (user_id, order_ref, total, payment_type, payment_status, created_at) VALUES (?, ?, ?, ?, ?, ?)");
-        $payment_status = ($selected_method == 'cash') ? 'on_progress' : 'unpaid';
-        $stmt->bind_param("isdsss", $user_id, $order_ref, $total, $selected_method, $payment_status, $created_at);
+        try {
+            if ($selected_method === 'cash') {
+                if (empty($selected_method)) {
+                    die("Metode pembayaran tidak boleh kosong.");
+                }
+
+                // Simpan ke tabel pesanan
+                $order_status = 'on_progress';
+                $payment_status = 'unpaid';
+
+                $stmt = $conn->prepare("INSERT INTO pesanan (user_id, order_ref, total, payment_type, payment_status, order_status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("isdssss", $user_id, $order_ref, $total, $selected_method, $payment_status, $order_status, $created_at);
+                $stmt->execute();
+                $pesanan_id = $stmt->insert_id;
+        
+                // Simpan item pesanan
+                $stmt_item = $conn->prepare("INSERT INTO pesanan_items (pesanan_id, produk_id, jumlah, harga) VALUES (?, ?, ?, ?)");
+                foreach ($order['items'] as $item) {
+                    $stmt_item->bind_param("iiid", $pesanan_id, $item['produk_id'], $item['jumlah'], $item['harga']);
+                    $stmt_item->execute();
+                }
+        
+                // Agar keranjang terhapus
+                $_SESSION['last_order_id'] = $pesanan_id;
+                $_SESSION['checkout_completed'] = true;
+
+                // Hapus order_details karena sudah diproses
+                unset($_SESSION['order_details']);
+
+                header("Location: payment_processed.php");
+                exit;
+            } elseif ($selected_method === 'qris') {
+                header("Location: payment_qris.php");
+                exit;
+            } else {
+                $error_message = "Metode pembayaran tidak dikenali.";
+            }
+        } catch (Exception $e) {
+            if ($DEBUG_MODE) {
+                echo "<pre>GAGAL SIMPAN KE DATABASE:\n" . $e->getMessage() . "</pre>";
+            } else {
+                echo "<p style='color:red;text-align:center;'>Terjadi kesalahan saat menyimpan data. Silakan coba lagi nanti.</p>";
+            }
+            exit();
+        }
+    }
+} elseif (!isset($_SESSION['order_details'])) {
+    header("Location: pesanan.php");
+    exit();
+}
+
+// Jika user dari payment_qris.php lalu memutuskan GANTI ke cash
+if (isset($_GET['ganti_ke']) && $_GET['ganti_ke'] === 'cash') {
+    if (!isset($_SESSION['order_details']) || empty($_SESSION['order_details']['items'])) {
+        die("Data order tidak ditemukan.");
+    }
+
+    $user_id = $_SESSION['id'];
+    $order = $_SESSION['order_details'];
+    $order_ref = 'ORD' . time();
+    $total = $order['total_harga'];
+    $payment_type = 'cash';
+    $payment_status = 'unpaid';
+    $order_status = 'on_progress';
+    $created_at = date('Y-m-d H:i:s');
+
+    try {
+        $stmt = $conn->prepare("INSERT INTO pesanan (user_id, order_ref, total, payment_type, payment_status, order_status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("isdssss", $user_id, $order_ref, $total, $payment_type, $payment_status, $order_status, $created_at);
+
         $stmt->execute();
         $pesanan_id = $stmt->insert_id;
 
-        // Simpan item pesanan
         $stmt_item = $conn->prepare("INSERT INTO pesanan_items (pesanan_id, produk_id, jumlah, harga) VALUES (?, ?, ?, ?)");
         foreach ($order['items'] as $item) {
             $stmt_item->bind_param("iiid", $pesanan_id, $item['produk_id'], $item['jumlah'], $item['harga']);
@@ -59,25 +141,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $_SESSION['last_order_id'] = $pesanan_id;
-
-        // Agar keranjang terhapus
         $_SESSION['checkout_completed'] = true;
+        unset($_SESSION['order_details']);
 
-        // Redirect sesuai metode pembayaran
-        if ($selected_method === 'qris') {
-            header("Location: payment_qris.php");
-        } elseif ($selected_method === 'cash') {
-            header("Location: payment_processed.php");
-        } else {
-            $error_message = "Metode pembayaran tidak dikenali.";
-        }
-
-        exit();
+        header("Location: payment_processed.php");
+        exit;
+    } catch (Exception $e) {
+        echo "<pre>Gagal menyimpan order cash dari QRIS: " . $e->getMessage() . "</pre>";
+        exit;
     }
-} elseif (!isset($_SESSION['order_details'])) {
-    header("Location: pesanan.php");
-    exit();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -135,4 +209,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="assets/js/pembayaran.js"></script>
 </body>
+
+<?php if (isset($error_message)): ?>
+    <div class="error-message">
+        <?php echo htmlspecialchars($error_message); ?>
+    </div>
+<?php endif; ?>
+
 </html>

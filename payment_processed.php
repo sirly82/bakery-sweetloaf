@@ -2,14 +2,12 @@
 session_start();
 
 // Cek apakah user dan order ada di session (opsional)
-if (!isset($_SESSION['id']) /* || !isset($_SESSION['order_details']) */) {
+if (!isset($_SESSION['id'])) {
     header("Location: login.php");
     exit();
 }
 
 $_SESSION['checkout_completed'] = true;
-header("Location: pesanan.php");
-
 ?>
 
 <!DOCTYPE html>

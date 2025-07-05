@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+/* ========= ROOT VARIABLE ========= */
+:root {
+  --primary-orange: #FF8C00;
+  --secondary-navy: #192A56;
+  --logout-blue: #0A0A23;
+  --white: #FFFFFF;
+  --light-grey: #F5F5F5;
+  --dark-grey: #333333;
+  --text-color: #444444;
+  --shadow-light: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --border-radius-small: 8px;
+  --border-radius-medium: 12px;
+}
+
+/* ========= RESET ========= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', Arial, sans-serif;
+  background-color: var(--light-grey);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+/* ========= HEADER ========= */
+header {
+  background-color: var(--primary-orange);
+  padding: 25px 0;
+  text-align: center;
+  color: var(--white);
+  box-shadow: var(--shadow-light);
+}
+
+header h1 {
+  font-size: 2.4em;
+  font-weight: 700;
+}
+
+/* ========= NAVIGATION ========= */
+nav {
+  background-color: var(--white);
+  box-shadow: var(--shadow-light);
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  padding: 12px 0;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: var(--dark-grey);
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--border-radius-small);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+nav ul li a:hover {
+  background-color: var(--primary-orange);
+  color: var(--white);
+}
+
+/* ========= CONTAINER ========= */
+.container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: var(--white);
+  border-radius: var(--border-radius-medium);
+  box-shadow: var(--shadow-light);
+}
+
+.container h1 {
+  text-align: center;
+  color: var(--secondary-navy);
+  margin-bottom: 30px;
+  font-size: 2em;
+}
+
+/* ========= TABLE ========= */
+.tabel-pesanan {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+
+.tabel-pesanan th,
+.tabel-pesanan td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.tabel-pesanan th {
+  background-color: #f3e8dc;
+  color: var(--dark-grey);
+}
+
+/* ========= STATUS ========= */
+.status {
+  font-weight: bold;
+}
+
+.status.paid {
+  color: green;
+}
+
+.status.unpaid {
+  color: orange;
+}
+
+.status.cancelled {
+  color: red;
+}
+
+.status.pending {
+  color: #999;
+}
+
+.status.on_progress {
+  color: #007bff;
+}
+
+.status.completed {
+  color: green;
+}
+
+/* ========= EMPTY ========= */
+.kosong {
+  text-align: center;
+  padding: 40px;
+  font-style: italic;
+  color: #777;
+}
+
+/* ========= RESPONSIVE ========= */
+@media (max-width: 768px) {
+  nav ul {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .container {
+    padding: 15px;
+  }
+
+  .container h1 {
+    font-size: 1.6em;
+  }
+
+  .tabel-pesanan {
+    font-size: 14px;
+  }
+
+  .tabel-pesanan th,
+  .tabel-pesanan td {
+    padding: 8px;
+  }
+}

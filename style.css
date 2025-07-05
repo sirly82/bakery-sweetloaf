@@ -1009,3 +1009,21 @@ footer .container {
         font-size: 1.3em;
     }
 }
+
+.notif {
+  padding: 12px 20px;
+  margin: 0 auto 20px auto;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 500;
+  max-width: 600px;
+  text-align: center;
+  border: 1px solid transparent;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.notif.success {
+  background-color: #e6ffed;
+  color: #1a7f37;
+  border-color: #b7f0c0;
+}
