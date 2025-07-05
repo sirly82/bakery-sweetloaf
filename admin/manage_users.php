@@ -127,7 +127,7 @@ if ($result_users && $result_users->num_rows > 0) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Akun Admin & User - SweetLoaf Bakery Admin</title>
-    <link rel="stylesheet" href="admin_style.css">
+    <link rel="stylesheet" href="assets/styles/admin_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Styling khusus untuk halaman manajemen pengguna */
@@ -357,7 +357,7 @@ if ($result_users && $result_users->num_rows > 0) {
 
         <?php require_once 'includes/admin_footer.php'; ?>
     </div>
-    <script src="admin.js"></script>
+    <script src="assets/js/admin.js"></script>
     <?php $conn->close(); ?>
 </body>
 </html>

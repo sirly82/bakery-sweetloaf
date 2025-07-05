@@ -118,7 +118,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <title>Laporan - SweetLoaf Bakery Admin</title>
-    <link rel="stylesheet" href="admin_style.css">
+    <link rel="stylesheet" href="assets/styles/admin_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -212,6 +212,6 @@ $conn->close();
 
         <?php require_once 'includes/admin_footer.php'; ?>
     </div>
-    <script src="admin.js"></script>
+    <script src="assets/js/admin.js"></script>
 </body>
 </html>

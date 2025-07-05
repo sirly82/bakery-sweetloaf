@@ -1,6 +1,24 @@
 <?php
 // admin/cashier.php
 
+// Aktifkan error reporting (khusus untuk debug)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+// Tulis log jika terjadi error yang tidak ditangkap
+set_exception_handler(function ($e) {
+    error_log('Uncaught Exception: ' . $e->getMessage());
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Server Error: ' . $e->getMessage()]);
+    } else {
+        echo "<pre>Server Error: " . $e->getMessage() . "</pre>";
+    }
+    exit;
+});
+
 require_once 'includes/admin_auth.php';
 require_once '../db_connect.php';
 
@@ -28,6 +46,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
         case 'add_to_cart':
             $product_id = filter_var($_POST['product_id'], FILTER_SANITIZE_NUMBER_INT);
             $qty_to_add = filter_var($_POST['qty'], FILTER_SANITIZE_NUMBER_INT);
+            $user_id = $_SESSION['admin_id'] ?? 1; // Sesuaikan jika ada session login admin
 
             if ($product_id && $qty_to_add > 0) {
                 try {
@@ -40,18 +59,43 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 
                     if ($product) {
                         $current_qty_in_cart = $_SESSION['cashier_cart'][$product_id]['qty'] ?? 0;
-                        if (($current_qty_in_cart + $qty_to_add) <= $product['stok']) {
+                        $new_qty = $current_qty_in_cart + $qty_to_add;
+
+                        if ($new_qty <= $product['stok']) {
+                            // Update session
                             $_SESSION['cashier_cart'][$product_id] = [
                                 'id' => $product['id'],
                                 'nama' => $product['nama'],
                                 'harga' => $product['harga'],
-                                'qty' => $current_qty_in_cart + $qty_to_add,
-                                'stok_tersedia' => $product['stok'] // Simpan stok asli untuk validasi di JS
+                                'qty' => $new_qty,
+                                'stok_tersedia' => $product['stok']
                             ];
+
+                            // Cek apakah produk sudah ada di keranjang DB
+                            $cek_stmt = $conn->prepare("SELECT id FROM keranjang WHERE user_id = ? AND produk_id = ?");
+                            $cek_stmt->bind_param("ii", $user_id, $product_id);
+                            $cek_stmt->execute();
+                            $cek_result = $cek_stmt->get_result();
+
+                            if ($cek_result->num_rows > 0) {
+                                // Update jumlah
+                                $update_stmt = $conn->prepare("UPDATE keranjang SET jumlah = jumlah + ? WHERE user_id = ? AND produk_id = ?");
+                                $update_stmt->bind_param("iii", $qty_to_add, $user_id, $product_id);
+                                $update_stmt->execute();
+                                $update_stmt->close();
+                            } else {
+                                // Insert baru
+                                $insert_stmt = $conn->prepare("INSERT INTO keranjang (user_id, produk_id, jumlah) VALUES (?, ?, ?)");
+                                $insert_stmt->bind_param("iii", $user_id, $product_id, $qty_to_add);
+                                $insert_stmt->execute();
+                                $insert_stmt->close();
+                            }
+                            $cek_stmt->close();
+
                             $response['success'] = true;
                             $response['message'] = 'Produk berhasil ditambahkan ke keranjang.';
                         } else {
-                            $response['message'] = 'Stok tidak cukup untuk jumlah yang diminta. Stok tersedia: ' . ($product['stok'] - $current_qty_in_cart);
+                            $response['message'] = 'Stok tidak cukup. Maksimum tersedia: ' . ($product['stok'] - $current_qty_in_cart);
                         }
                     } else {
                         $response['message'] = 'Produk tidak ditemukan.';
@@ -74,10 +118,26 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 
                 if ($new_qty > 0 && $new_qty <= $available_stock) {
                     $_SESSION['cashier_cart'][$product_id]['qty'] = $new_qty;
+
+                    // Update juga di database
+                    $user_id = $_SESSION['admin_id'] ?? 1;
+                    $stmt = $conn->prepare("UPDATE keranjang SET jumlah = ? WHERE user_id = ? AND produk_id = ?");
+                    $stmt->bind_param("iii", $new_qty, $user_id, $product_id);
+                    $stmt->execute();
+                    $stmt->close();
+
                     $response['success'] = true;
                     $response['message'] = 'Kuantitas berhasil diperbarui.';
                 } elseif ($new_qty <= 0) {
                     unset($_SESSION['cashier_cart'][$product_id]);
+
+                    // Hapus dari database
+                    $user_id = $_SESSION['admin_id'] ?? 1;
+                    $stmt = $conn->prepare("DELETE FROM keranjang WHERE user_id = ? AND produk_id = ?");
+                    $stmt->bind_param("ii", $user_id, $product_id);
+                    $stmt->execute();
+                    $stmt->close();
+
                     $response['success'] = true;
                     $response['message'] = 'Produk dihapus dari keranjang.';
                 } else {
@@ -92,6 +152,14 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
             $product_id = filter_var($_POST['product_id'], FILTER_SANITIZE_NUMBER_INT);
             if (isset($_SESSION['cashier_cart'][$product_id])) {
                 unset($_SESSION['cashier_cart'][$product_id]);
+
+                // Hapus dari database
+                $user_id = $_SESSION['admin_id'] ?? 1;
+                $stmt = $conn->prepare("DELETE FROM keranjang WHERE user_id = ? AND produk_id = ?");
+                $stmt->bind_param("ii", $user_id, $product_id);
+                $stmt->execute();
+                $stmt->close();
+
                 $response['success'] = true;
                 $response['message'] = 'Produk berhasil dihapus dari keranjang.';
             } else {
@@ -103,6 +171,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
             $customer_name = filter_var($_POST['customer_name'], FILTER_SANITIZE_STRING);
             $notes = filter_var($_POST['notes'], FILTER_SANITIZE_STRING);
             $grand_total = filter_var($_POST['grand_total'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+            $user_id = $_SESSION['admin_id'] ?? 1;
 
             if (empty($_SESSION['cashier_cart'])) {
                 $response['message'] = 'Keranjang belanja kosong. Tidak ada pesanan untuk diproses.';
@@ -110,50 +179,54 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
                 exit();
             }
 
-            $order_details_string = '';
-            $total_items_count = 0;
-            $products_to_update_stock = [];
-
-            foreach ($_SESSION['cashier_cart'] as $item) {
-                $order_details_string .= htmlspecialchars($item['nama']) . ' (' . $item['qty'] . '), ';
-                $total_items_count += $item['qty'];
-                $products_to_update_stock[] = [
-                    'id' => $item['id'],
-                    'qty_ordered' => $item['qty']
-                ];
-            }
-            $order_details_string = rtrim($order_details_string, ', '); // Hapus koma terakhir
-
-            // Mulai transaksi
             $conn->begin_transaction();
             try {
-                // 1. Masukkan pesanan ke tabel 'pesanan'
-                $stmt_order = $conn->prepare("INSERT INTO pesanan (nama_pengguna, pesanan, total_item, total_harga, catatan, status) VALUES (?, ?, ?, ?, ?, 'Selesai')");
-                $stmt_order->bind_param("ssids", $customer_name, $order_details_string, $total_items_count, $grand_total, $notes);
-                $stmt_order->execute();
-                $stmt_order->close();
+                // Simpan ke tabel pesanan
+                $total_item = array_sum(array_column($_SESSION['cashier_cart'], 'qty'));
+                $order_ref = 'ORD' . time(); // unik
+                $payment_status = 'paid'; // untuk kasir dianggap langsung lunas
+                $created_at = date('Y-m-d H:i:s');
 
-                // 2. Perbarui stok produk
-                foreach ($products_to_update_stock as $product) {
-                    $stmt_stock = $conn->prepare("UPDATE products SET stok = stok - ? WHERE id = ? AND stok >= ?");
-                    $stmt_stock->bind_param("iii", $product['qty_ordered'], $product['id'], $product['qty_ordered']);
-                    $stmt_stock->execute();
-                    if ($stmt_stock->affected_rows === 0) {
-                        // Jika affected_rows adalah 0, berarti stok tidak cukup atau produk tidak ditemukan
-                        throw new Exception("Gagal memperbarui stok untuk produk ID " . $product['id'] . ". Kemungkinan stok tidak mencukupi.");
+                $stmt_pesanan = $conn->prepare("INSERT INTO pesanan (user_id, nama_pengguna, total_item, total_harga, catatan, status, payment_tipe, order_ref, payment_status, created_at) 
+                VALUES (?, ?, ?, ?, ?, 'Selesai', 'cash', ?, ?, ?)");
+                $stmt_pesanan->bind_param("isidssss", $user_id, $customer_name, $total_item, $grand_total, $notes, $order_ref, $payment_status, $created_at);
+                $stmt_pesanan->execute();
+                $pesanan_id = $stmt_pesanan->insert_id;
+                $stmt_pesanan->close();
+
+                // Simpan detail item pesanan dan kurangi stok
+                foreach ($_SESSION['cashier_cart'] as $item) {
+                    // Detail pesanan
+                    $stmt_detail = $conn->prepare("INSERT INTO pesanan_satuan (pesanan_id, produk_id, jumlah, harga) VALUES (?, ?, ?, ?)");
+                    $stmt_detail->bind_param("iiid", $pesanan_id, $item['id'], $item['qty'], $item['harga']);
+                    $stmt_detail->execute();
+                    $stmt_detail->close();
+
+                    // Update stok
+                    $stmt_stok = $conn->prepare("UPDATE products SET stok = stok - ? WHERE id = ? AND stok >= ?");
+                    $stmt_stok->bind_param("iii", $item['qty'], $item['id'], $item['qty']);
+                    $stmt_stok->execute();
+                    if ($stmt_stok->affected_rows === 0) {
+                        throw new Exception("Stok tidak cukup untuk produk ID " . $item['id']);
                     }
-                    $stmt_stock->close();
+                    $stmt_stok->close();
                 }
 
-                // Komit transaksi jika semua berhasil
+                // Bersihkan keranjang user
+                $stmt_clear_cart = $conn->prepare("DELETE FROM keranjang WHERE user_id = ?");
+                $stmt_clear_cart->bind_param("i", $user_id);
+                $stmt_clear_cart->execute();
+                $stmt_clear_cart->close();
+
+                $_SESSION['cashier_cart'] = [];
+
                 $conn->commit();
-                $_SESSION['cashier_cart'] = []; // Kosongkan keranjang setelah pesanan berhasil
                 $response['success'] = true;
-                $response['message'] = 'Pesanan berhasil diselesaikan!';
-                $response['redirect'] = 'cashier.php'; // Refresh halaman setelah sukses
+                $response['message'] = 'Pesanan berhasil disimpan!';
+                $response['redirect'] = 'cashier.php';
             } catch (Exception $e) {
-                $conn->rollback(); // Rollback transaksi jika ada error
-                $response['message'] = 'Gagal memproses pesanan: ' . $e->getMessage();
+                $conn->rollback();
+                $response['message'] = 'Gagal menyimpan pesanan: ' . $e->getMessage();
             }
             break;
 
@@ -205,7 +278,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kasir (POS) - SweetLoaf Bakery Admin</title>
-    <link rel="stylesheet" href="admin_style.css">
+    <link rel="stylesheet" href="assets/styles/admin_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -234,8 +307,8 @@ $conn->close();
                         <?php if (!empty($products)): ?>
                             <?php foreach ($products as $product): ?>
                                 <div class="product-card" data-id="<?php echo htmlspecialchars($product['id']); ?>" data-nama="<?php echo htmlspecialchars($product['nama']); ?>" data-harga="<?php echo htmlspecialchars($product['harga']); ?>" data-stok="<?php echo htmlspecialchars($product['stok']); ?>">
-                                    <?php if (!empty($product['foto']) && file_exists('../uploads/' . $product['foto'])): ?>
-                                        <img src="../uploads/<?php echo htmlspecialchars($product['foto']); ?>" alt="<?php echo htmlspecialchars($product['nama']); ?>">
+                                    <?php if (!empty($product['foto']) && file_exists('assets/uploads/products/' . $product['foto'])): ?>
+                                        <img src="assets/uploads/products/<?php echo htmlspecialchars($product['foto']); ?>" alt="<?php echo htmlspecialchars($product['nama']); ?>">
                                     <?php else: ?>
                                         <img src="../assets/placeholder.png" alt="No Image">
                                     <?php endif; ?>
@@ -301,14 +374,6 @@ $conn->close();
 
         <?php include_once 'includes/admin_footer.php'; ?>
     </div>
-
-    <script>
-        // Pesan PHP untuk ditampilkan oleh JavaScript
-        const initialMessage = "<?php echo $message; ?>";
-        const initialMessageType = "<?php echo $message_type; ?>";
-
-        // Tambahkan fungsi untuk menampilkan alert ke admin.js jika belum ada
-        // function showAlert(message, type = 'info') { ... }
-    </script>
+    <script src="assets/js/cashier.js"></script>
 </body>
 </html>

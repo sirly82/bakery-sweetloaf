@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Admin - SweetLoaf Bakery</title>
-    <link rel="stylesheet" href="admin_style.css">
+    <link rel="stylesheet" href="assets/styles/admin_style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     </head>
 <body class="login-page"> <div class="overlay"></div>
